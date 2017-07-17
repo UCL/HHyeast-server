@@ -1,0 +1,6 @@
+bokeh
+tornado==4.4.2
+flexx
+scipy
+scikit-learn
+-e git+https://github.com/UCL-RITS/CSB-structural-bio-tools.git#egg=CSB-structural-bio-tools
