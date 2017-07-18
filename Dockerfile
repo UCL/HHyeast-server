@@ -10,4 +10,4 @@ RUN pip install -r requirements.txt
 
 EXPOSE 5006
 
-CMD bokeh serve lolliplotServer.py --allow-websocket-origin=0.0.0.0:5006
+CMD bokeh serve lolliplotServer.py
