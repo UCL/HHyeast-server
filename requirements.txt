@@ -1,7 +1,9 @@
-bokeh
-tornado==4.4.2
+flask
+flask-wtf
 flexx
 scipy
+numpy
 scikit-learn
+ipython
 -e git+https://github.com/UCL-RITS/CSB-structural-bio-tools.git#egg=CSB-structural-bio-tools
 jinja2
