@@ -6,7 +6,7 @@ import atexit
 
 from flask_wtf import FlaskForm
 from flask_wtf.csrf import CSRFProtect
-from wtforms import SelectField
+from wtforms import SelectField, SubmitField
 
 from bokeh.embed import server_document
 from bokeh.plotting import figure
@@ -23,39 +23,63 @@ app.config['SECRET_KEY']='la'
 csrf = CSRFProtect(app)
 
 
-bokeh_process = subprocess.Popen(
+bokeh_process1 = subprocess.Popen(
     ['bokeh', 'serve', '--allow-websocket-origin=localhost:5000', 'lolliplotServer.py'], stdout=subprocess.PIPE)
+bokeh_process2 = subprocess.Popen(
+    ['bokeh', 'serve', '--allow-websocket-origin=localhost:5000', '--port=5007', 'lolliplotServerDetail.py'], stdout=subprocess.PIPE)
 
 @atexit.register
 def kill_server():
-    bokeh_process.kill()
+    bokeh_process1.kill()
+    bokeh_process2.kill()
 
 
-class MyForm(FlaskForm):
+class IndexForm(FlaskForm):
     filelist = glob.glob('/Users/ilektra/HHprY-Project/*.ssw11.hhr')
     filename = SelectField('filename',
                 choices = [(os.path.basename(f).split('.')[0], os.path.basename(f).split('.')[0]) for f in filelist])
 
+class DetailForm(FlaskForm):
+    button = SubmitField()
+
 
 @app.route('/', methods=['POST','GET'])
 def index():
-    form = MyForm()
+    form = IndexForm()
     if form.validate_on_submit():
         filename = form.filename.data
         url = url_for('load_name',filename=filename)
         return redirect(url)
     return render_template('index.html',form=form)
 
-@app.route('/<filename>')
+@app.route('/<filename>', methods=['POST','GET'])
 def load_name(filename):
     filepath = os.path.join('/Users/ilektra/HHprY-Project',filename+'.0.ssw11.hhr')
     bokeh_script = server_document(
         url='http://localhost:5006/lolliplotServer', arguments=dict(filename=filepath))
 
+    form = DetailForm()
+    if form.validate_on_submit():
+        url = url_for('load_detail',filename=filename)
+        return redirect(url)
+
     html = render_template(
         'plot.html',
+        plot_script=bokeh_script,
+        name=filename,
+        form=form)
+
+    return html
+
+@app.route('/<filename>/detail')
+def load_detail(filename):
+    filepath = os.path.join('/Users/ilektra/HHprY-Project',filename+'.0.ssw11.hhr')
+    bokeh_script = server_document(
+        url='http://localhost:5007/lolliplotServerDetail', arguments=dict(filename=filepath))
+
+    html = render_template(
+        'detail.html',
         plot_script=bokeh_script,
         name=filename )
 
     return html
-
