@@ -47,7 +47,7 @@ def fill_data(nhits,hitList):
         dx.append((hitList[i]).qend-(hitList[i]).qstart)
         y.append(float(i+1)/2.)
         pcent.append(100*(hitList[i]).probability)
-        name.append((hitList[i]).id+' : {:.2f}%'.format(pcent[i]))
+        name.append((hitList[i]).id+' : '+str(pcent[i])+'%')
         if hasattr(hitList[i],'name'):
             detail.append(hitList[i].name)
         else :
@@ -93,13 +93,12 @@ def cluster_data_pred(x2d, n_clust):
 pal = palettes.viridis(10)
 cmap = LinearColorMapper(palette=pal, low=50, high=100)
 
-# Retrieving the arguments
-args = curdoc().session_context.request.arguments
-filename = args.get('filename')[0]
-
-### Read data
+### Empty defaults. Meaningful values and data will be read from
+### the file that will be input from the widgets
+xmax = 100
+nhits = 100
 prob_cutoff = 0.5
-xmax, nhits, ref_data = parse_file(filename, prob_cutoff)
+ref_data = dict(x1=[], x2=[], dx=[], y=[], name=[], pcent=[], detail=[])
 source = ColumnDataSource( data=dict(ref_data) ) # source holds a COPY of the ref_data dict
 
 
@@ -115,9 +114,10 @@ p1 = figure(tools=[hover1,'save','pan','wheel_zoom'], width=1500, height=25*nhit
             x_range=(0,xmax), y_range=(nhits/2+1,0), x_axis_location="above")
 p1.ygrid.visible=False
 p1.yaxis.visible=False
-### Need this callback mechanism in order to update the plots when reading new probThr
-myCallback = CustomJS(code="""
-    window.dispatchEvent(new Event('resize'));
+### Need this callback mechanism in order to update the plots when reading new file/probThr
+myCallback = CustomJS(args=dict(fig=p1), code="""
+    var doc = fig.document;
+    doc.resize();
 """)
 p1.y_range.callback = myCallback
 ###
@@ -145,6 +145,10 @@ p2 = figure(tools=[hover2,'save','pan','wheel_zoom'], plot_width=1500, plot_heig
 p2.ygrid.visible=False
 p2.yaxis.visible=False
 ### Need this callback mechanism in order to update the plots when reading new file/probThr
+myCallback = CustomJS(args=dict(fig=p2), code="""
+    var doc = fig.document;
+    doc.resize();
+""")
 p2.y_range.callback = myCallback
 ###
 p2.hbar(y="y", height=0.4, left="x1", right="x2", source=source,
@@ -199,9 +203,31 @@ def slider_handler2(attrname, old, new):
 ncl_slider2.on_change("value", slider_handler2)
 
 
-### Tab 1 textInput widget
+### Tab 1 textInput widgets
+filename_text = TextInput(value="", title="File name:")
 threshold_text = TextInput(value="0.5", title="Probability threshold:")
 ### Data-textInput interaction
+def text_handler1(attrname, old, new):
+    ### TODO: these globals and manually recalling of the parser and stuff
+    ### is ugly. Need to make the parser (or something) a class.
+    global ref_data, p1, pcl1, p2, pcl2, filename, prob_cutoff
+    filename = filename_text.value
+    xmax, nhits, ref_data = parse_file(filename, prob_cutoff)
+    p1.height = 25*nhits
+    p1.plot_height = 25*nhits
+    p1.x_range.end = xmax
+    p1.y_range.start = nhits/2+1
+    pcl1.x_range.end = xmax
+    pcl1.y_range.end = xmax
+    p2.height = 25*nhits
+    p2.plot_height = 25*nhits
+    p2.x_range.end = xmax
+    p2.y_range.start = nhits/2+1
+    pcl2.x_range.end = xmax
+    pcl2.y_range.end = xmax
+    source.data = ref_data
+    ncl_slider1.value = 0
+    ncl_slider2.value = 0
 def text_handler2(attrname, old, new):
     global ref_data, p1, p2, prob_cutoff
     global filename
@@ -215,11 +241,12 @@ def text_handler2(attrname, old, new):
     source.data = ref_data
     ncl_slider1.value = 0
     ncl_slider2.value = 0
+filename_text.on_change("value", text_handler1)
 threshold_text.on_change("value", text_handler2)
 
 
 ### Page layouts
-tab1 = Panel( child=layout( [ [widgetbox(ncl_slider1, threshold_text), pcl1 ],
+tab1 = Panel( child=layout( [ [widgetbox(ncl_slider1, filename_text, threshold_text), pcl1 ],
                               [p1] ] ),
               title="Passive clustering")
 tab2 = Panel( child=layout( [widgetbox(ncl_slider2), pcl2 ],
