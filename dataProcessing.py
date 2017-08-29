@@ -1,9 +1,10 @@
 from csb.bio.io import HHpredOutputParser
 from sklearn.cluster import KMeans
 
+import sys
 
 # Parse HHSearch output file up to probability cutoff
-def parse_file(filename, prob_cutoff):
+def parse_file(filename, prob_cutoff, db):
     hhpParser = HHpredOutputParser()
     hitList = hhpParser.parse_file(filename)
     xmax = hitList.match_columns
@@ -13,13 +14,13 @@ def parse_file(filename, prob_cutoff):
         if (hitList[i]).probability < prob_cutoff:
             break
         nhits += 1
-    x1, x2, dx, y, pcent, name, detail = fill_data(nhits, hitList)
+    x1, x2, dx, y, pcent, name, detail = fill_data(nhits, hitList, db)
     data = dict(x1=x1, x2=x2, dx=dx, y=y, name=name, pcent=pcent, detail=detail)
 
-    return xmax, nhits, data
+    return xmax, len(x1), data
 
 # Read data from hitList structure
-def fill_data(nhits,hitList):
+def fill_data(nhits, hitList, db):
     x1 = []
     x2 = []
     dx = []
@@ -28,14 +29,23 @@ def fill_data(nhits,hitList):
     name = []
     detail = []
     for i in range(0,nhits):
-        x1.append((hitList[i]).qstart)
-        x2.append((hitList[i]).qend)
-        dx.append((hitList[i]).qend-(hitList[i]).qstart)
-        y.append(float(i+1)/2.)
-        pcent.append(100*(hitList[i]).probability)
-        name.append((hitList[i]).id+' : {:.2f}%'.format(pcent[i]))
-        if hasattr(hitList[i],'name'):
-            detail.append(hitList[i].name)
+        hit = hitList[i]
+        if (hit.id)[0:2]=='PF':
+            if db!='pfam':
+                continue
+        elif (hit.id)[0:3]=='NP_':
+            if db!='yeast':
+                continue
+        elif db!='pdb':
+            continue
+        x1.append(hit.qstart)
+        x2.append(hit.qend)
+        dx.append(hit.qend-hit.qstart)
+        y.append(float(len(y)+1)/2.)
+        pcent.append(100*hit.probability)
+        name.append(hit.id+' : {:.2f}%'.format(pcent[-1]))
+        if hasattr(hit,'name'):
+            detail.append(hit.name)
         else :
             detail.append("no detail")
 

@@ -60,7 +60,7 @@ def load_name(filename):
 
     form = DetailForm()
     if form.validate_on_submit():
-        url = url_for('load_detail',filename=filename)
+        url = url_for('load_detail', filename=filename, db='pfam')
         return redirect(url)
 
     html = render_template(
@@ -71,11 +71,11 @@ def load_name(filename):
 
     return html
 
-@app.route('/<filename>/detail')
-def load_detail(filename):
+@app.route('/<filename>/<db>')
+def load_detail(filename, db):
     filepath = os.path.join('/Users/ilektra/HHprY-Project',filename+'.0.ssw11.hhr')
     bokeh_script = server_document(
-        url='http://localhost:5007/lolliplotServerDetail', arguments=dict(filename=filepath))
+        url='http://localhost:5007/lolliplotServerDetail', arguments=dict(filename=filepath, db=db))
 
     html = render_template(
         'detail.html',

@@ -11,6 +11,7 @@ from bokeh.models import HoverTool, CustomJS
 import numpy as np
 import dataProcessing
 
+import sys
 
 pal = palettes.viridis(10)
 cmap = LinearColorMapper(palette=pal, low=50, high=100)
@@ -18,10 +19,11 @@ cmap = LinearColorMapper(palette=pal, low=50, high=100)
 # Retrieving the arguments
 args = curdoc().session_context.request.arguments
 filename = args.get('filename')[0]
+db = args.get('db')[0].decode("utf-8")
 
 ### Read data
 prob_cutoff = 0.5
-xmax, nhits, ref_data = dataProcessing.parse_file(filename, prob_cutoff)
+xmax, nhits, ref_data = dataProcessing.parse_file(filename, prob_cutoff, db)
 source = ColumnDataSource( data=dict(ref_data) ) # source holds a COPY of the ref_data dict
 
 
@@ -76,7 +78,7 @@ def text_handler2(attrname, old, new):
     global ref_data, p1, p2, prob_cutoff
     global filename
     prob_cutoff = float(threshold_text.value)
-    xmax, nhits, ref_data = dataProcessing.parse_file(filename, prob_cutoff)
+    xmax, nhits, ref_data = dataProcessing.parse_file(filename, prob_cutoff, db)
     cmap.low = prob_cutoff*100
     p1.height = 25*nhits
     p1.y_range.start = nhits/2+1
