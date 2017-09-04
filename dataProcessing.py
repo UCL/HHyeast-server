@@ -36,6 +36,11 @@ def fill_data(nhits, hitList, db):
         elif (hit.id)[0:3]=='NP_':
             if db!='yeast':
                 continue
+            else:
+                fixed = yeast_name_fixed(hit.id)
+                hit.id = fixed[0]
+                if hasattr(hit,'name'):
+                    hit.name = fixed[1]
         elif db!='pdb':
             continue
         x1.append(hit.qstart)
@@ -50,6 +55,37 @@ def fill_data(nhits, hitList, db):
             detail.append("no detail")
 
     return x1, x2, dx, y, pcent, name, detail
+
+
+yeast_name_map = {}
+# Fix ORF name from yeast database
+def yeast_name_fixed(name):
+    global yeast_name_map
+    if len(yeast_name_map)==0:
+        fill_yeast_name_map()
+    print(yeast_name_map[name], file=sys.stderr)
+    return yeast_name_map[name]
+
+# Fill yeast name mapping dictionary
+def fill_yeast_name_map():
+    global yeast_name_map
+    with open("Saccharomyces_cerevisiae_S288c.fas", "r") as f:
+        for line in f:
+            if line[0]!='>':
+                continue
+            words = line.split()[0:-3]
+            old_name = (words[0])[1:]
+            new_name = old_name
+            description = new_name+' '+' '.join(words[1:])
+            if len(words)==2:
+                new_name = words[1]
+                description = new_name
+            else:
+                if words[1]=='hypothetical':
+                    new_name = words[3]
+                    description = new_name+' (hypothetical protein)'
+            yeast_name_map[old_name] = new_name, description
+
 
 # Active clustering: override input data per hit  with data per cluster
 def cluster_data(x2d, pcent, n_clust):
