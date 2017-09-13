@@ -7,6 +7,7 @@ import atexit
 from flask_wtf import FlaskForm
 from flask_wtf.csrf import CSRFProtect
 from wtforms import SelectField, SubmitField
+import context_processors as cp
 
 from bokeh.embed import server_document
 from bokeh.plotting import figure
@@ -21,6 +22,7 @@ from bokeh.layouts import widgetbox, column, layout
 app = Flask(__name__)
 app.config['SECRET_KEY']='la'
 csrf = CSRFProtect(app)
+cp.setup(app)
 
 
 bokeh_process1 = subprocess.Popen(
