@@ -48,35 +48,35 @@
     <script src="//static.ucl.ac.uk/indigo/js/lib/modernizr-custom.js"></script>
 
     <script>
-      var cuttingTheMustard = document.querySelector && window.localStorage && window.addEventListener;
+     var cuttingTheMustard = document.querySelector && window.localStorage && window.addEventListener;
 
-      Modernizr.load({
-        //cutting the mustard as used by the BBC
-        test: cuttingTheMustard
-        //if old browser load the shiv
-        ,
-        nope: [
-          '//static.ucl.ac.uk/indigo/js/lib/html5shiv-printshiv.min.js', '//static.ucl.ac.uk/indigo/js/lib/respond.min.js'
-        ]
-      });
-      //set conditional assets for main.js
-      var globalSiteSpecificVars = {
-        pathToJquery: '//static.ucl.ac.uk/indigo/js/lib/jquery-1.9.1.min',
-        googleAnalyticsIdsArray: [] //specify array of site specific id's NOT UCL generic UA-943297-1
-      }
-      if (cuttingTheMustard) {
-        globalSiteSpecificVars.pathToJquery = "//static.ucl.ac.uk/indigo/js/lib/jquery-2.1.1.min";
-      }
+     Modernizr.load({
+         //cutting the mustard as used by the BBC
+         test: cuttingTheMustard
+         //if old browser load the shiv
+         ,
+         nope: [
+             '//static.ucl.ac.uk/indigo/js/lib/html5shiv-printshiv.min.js', '//static.ucl.ac.uk/indigo/js/lib/respond.min.js'
+         ]
+     });
+     //set conditional assets for main.js
+     var globalSiteSpecificVars = {
+         pathToJquery: '//static.ucl.ac.uk/indigo/js/lib/jquery-1.9.1.min',
+         googleAnalyticsIdsArray: [] //specify array of site specific id's NOT UCL generic UA-943297-1
+     }
+     if (cuttingTheMustard) {
+         globalSiteSpecificVars.pathToJquery = "//static.ucl.ac.uk/indigo/js/lib/jquery-2.1.1.min";
+     }
     </script>
-  {% endblock head_scripts %}
+    {% endblock head_scripts %}
 
-  {% block extra_head %}
-  {% endblock extra_head %}
+    {% block extra_head %}
+    {% endblock extra_head %}
 
 </head>
 
 
-<body class="layout-horizontal layout-horizontal--nav-1col">
+<body class="layout-horizontal layout-horizontal--nav-1col" style="background-color: white;">
 
   <header class="header header--desktop">
 
