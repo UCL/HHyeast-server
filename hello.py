@@ -60,16 +60,26 @@ def load_name(filename):
     bokeh_script = server_document(
         url='http://localhost:5006/lolliplotServer', arguments=dict(filename=filepath))
 
-    form = DetailForm()
-    if form.validate_on_submit():
+    form1 = DetailForm()
+    if form1.validate_on_submit():
+        url = url_for('load_detail', filename=filename, db='pdb')
+        return redirect(url)
+    form2 = DetailForm()
+    if form2.validate_on_submit():
         url = url_for('load_detail', filename=filename, db='pfam')
+        return redirect(url)
+    form3 = DetailForm()
+    if form3.validate_on_submit():
+        url = url_for('load_detail', filename=filename, db='yeast')
         return redirect(url)
 
     html = render_template(
         'plot.html',
         plot_script=bokeh_script,
         name=filename,
-        form=form)
+        form1=form1,
+        form2=form2,
+        form3=form3)
 
     return html
 

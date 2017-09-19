@@ -34,25 +34,26 @@ hover1 = HoverTool(
     )
 
 ### Main figure
-p1 = figure(tools=[hover1,'save','pan','wheel_zoom'], width=1500, height=25*nhits,
-            x_range=(0,xmax), y_range=(nhits/2+1,0), x_axis_location="above")
-p1.ygrid.visible=False
-p1.yaxis.visible=False
+ymax = 10
+p = figure(tools=[hover1,'save','pan','wheel_zoom'], width=1500, height=25*max(nhits,ymax),
+           x_range=(0,xmax), y_range=(min(nhits,ymax)/2+1,0), x_axis_location="above")
+p.ygrid.visible=False
+p.yaxis.visible=False
 ### Need this callback mechanism in order to update the plots when reading new probThr
 myCallback = CustomJS(code="""
     window.dispatchEvent(new Event('resize'));
 """)
-p1.y_range.callback = myCallback
+p.y_range.callback = myCallback
 ###
-p1.hbar(y="y", height=0.4, left="x1", right="x2", source=source,
+p.hbar(y="y", height=0.4, left="x1", right="x2", source=source,
        color={'field': 'pcent', 'transform': cmap})
 labels_pname = LabelSet(x='x1', y='y', text='name', source=source, text_baseline='middle')
-p1.add_layout(labels_pname)
+p.add_layout(labels_pname)
 
 ### Clustering figure
-pcl1 = figure(tools=['save','pan','wheel_zoom'], width=500, height=500, x_range=(0,xmax), y_range=(0,xmax))
-pcl1.x(x="x1", y="dx", source=source,
-       color={'field': 'pcent', 'transform': cmap})
+pcl = figure(tools=['save','pan','wheel_zoom'], width=500, height=500, x_range=(0,xmax), y_range=(0,xmax))
+pcl.x(x="x1", y="dx", source=source,
+      color={'field': 'pcent', 'transform': cmap})
 
 
 ### Slider widget
@@ -75,19 +76,19 @@ ncl_slider.on_change("value", slider_handler)
 threshold_text = TextInput(value="0.5", title="Probability threshold:")
 ### Data-textInput interaction
 def text_handler2(attrname, old, new):
-    global ref_data, p1, p2, prob_cutoff
+    global ref_data, p, prob_cutoff
     global filename
     prob_cutoff = float(threshold_text.value)
     xmax, nhits, ref_data = dataProcessing.parse_file(filename, prob_cutoff, db)
     cmap.low = prob_cutoff*100
-    p1.height = 25*nhits
-    p1.y_range.start = nhits/2+1
+    p.height = 25*max(nhits,ymax)
+    p.y_range.start = nhits/2+1
     source.data = ref_data
     ncl_slider.value = 0
 threshold_text.on_change("value", text_handler2)
 
 
 ### Page layout
-page = gridplot( [ [widgetbox(ncl_slider, threshold_text), pcl1 ],
-                              [p1] ] )
+page = gridplot( [ [widgetbox(ncl_slider, threshold_text), pcl ],
+                              [p] ] )
 curdoc().add_root(page)

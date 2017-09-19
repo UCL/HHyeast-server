@@ -22,25 +22,52 @@ filename = args.get('filename')[0]
 
 ### Read data
 prob_cutoff = 0.5
-xmax1, nhits1, ref_data1 = dataProcessing.parse_file(filename, prob_cutoff, 'pfam')
-source1 = ColumnDataSource( data=dict(ref_data1) ) # source holds a COPY of the ref_data dict
-xmax2, nhits2, ref_data2 = dataProcessing.parse_file(filename, prob_cutoff, 'pfam')
-source2 = ColumnDataSource( data=dict(ref_data2) ) # source holds a COPY of the ref_data dict
+xmax = 0
+dbname_l = []
+nhits_l = []
+ref_data_l = []
+source_l = []
+xmax, nhits, ref_data = dataProcessing.parse_file(filename, prob_cutoff, 'pdb')
+if nhits!=0:
+    dbname_l.append('PDB')
+    nhits_l.append(nhits)
+    ref_data_l.append(dict(ref_data))
+    source_l.append(ColumnDataSource( data=dict(ref_data) )) # source holds a COPY of the ref_data dict
+xmax, nhits, ref_data = dataProcessing.parse_file(filename, prob_cutoff, 'pfam')
+if nhits!=0:
+    dbname_l.append('PFAM')
+    nhits_l.append(nhits)
+    ref_data_l.append(dict(ref_data))
+    source_l.append(ColumnDataSource( data=dict(ref_data) )) # source holds a COPY of the ref_data dict
+xmax, nhits, ref_data = dataProcessing.parse_file(filename, prob_cutoff, 'yeast')
+if nhits!=0:
+    dbname_l.append('YEAST')
+    nhits_l.append(nhits)
+    ref_data_l.append(dict(ref_data))
+    source_l.append(ColumnDataSource( data=dict(ref_data) )) # source holds a COPY of the ref_data dict
 
+### Stuff common to all plots:
 ### Need this callback mechanism in order to update the plots when reading new probThr
 myCallback = CustomJS(code="""
     window.dispatchEvent(new Event('resize'));
 """)
+# Tooltip
+hover = HoverTool(
+    tooltips = [ ("match No", "$index"),
+                 ("description", "@detail") ]
+)
 
 page = column()
-
-if nhits1!=0:
-    ncl = 10
+ncl = 10
+plots_l = []
+for dbname, nhits, ref_data, source in zip(dbname_l, nhits_l, ref_data_l, source_l):
     #print(nhits1, file=sys.stderr)
-    if nhits1>=ncl:
+    title = 'Matches to database '+dbname
+    if nhits>=ncl:
+        title = title+', clustered in '+str(ncl)
         ### Cluster data
-        x2d = np.vstack((ref_data1['x1'], ref_data1['dx'])).T
-        x1, dx, y, pcentcl, name, detail, clabels = dataProcessing.cluster_data(x2d, ref_data1['pcent'], ncl)
+        x2d = np.vstack((ref_data['x1'], ref_data['dx'])).T
+        x1, dx, y, pcentcl, name, detail, clabels = dataProcessing.cluster_data(x2d, ref_data['pcent'], ncl)
         new_data = dict()
         new_data['x1'] = x1
         new_data['x2'] = x1+dx
@@ -50,29 +77,25 @@ if nhits1!=0:
         new_data['pcent'] = pcentcl
         new_data['detail'] = detail
         new_data['cluster'] = [1]*ncl
-        source1.data = new_data
-        ref_data1['cluster'] = clabels*100./float(ncl)
+        source.data = new_data
+        ref_data['cluster'] = clabels*100./float(ncl)
+    else:
+        title = title+', not clustered'
 
-
-    ### Tooltip
-    hover1 = HoverTool(
-        tooltips = [ ("match No", "$index"),
-                     ("description", "@detail") ]
-    )
-    
     ### Main figure
-    p1 = figure(tools=[hover1,'save','pan','wheel_zoom'], title='Database PDB, hits clustered in 10.', width=1500, height=25*ncl,
-                x_range=(0,xmax1), y_range=(min(ncl,nhits1)/2+1,0), x_axis_location="above")
+    p1 = figure(tools=[hover,'save','pan','wheel_zoom'], title=title, width=1500, height=25*ncl,
+                x_range=(0,xmax), y_range=(min(ncl,nhits)/2+1,0), x_axis_location="above")
     p1.ygrid.visible=False
     p1.yaxis.visible=False
     p1.y_range.callback = myCallback
-    p1.hbar(y="y", height=0.4, left="x1", right="x2", source=source1,
+    p1.hbar(y="y", height=0.4, left="x1", right="x2", source=source,
             color={'field': 'pcent', 'transform': cmap})
-    labels_pname1 = LabelSet(x='x1', y='y', text='name', source=source1, text_baseline='middle')
+    labels_pname1 = LabelSet(x='x1', y='y', text='name', source=source, text_baseline='middle')
     p1.add_layout(labels_pname1)
+    plots_l.append(p1)
 
 
     ### Page layout
-    page = column( p1 )
+    page = column( plots_l )
 
 curdoc().add_root(page)
