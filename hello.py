@@ -26,9 +26,9 @@ cp.setup(app)
 
 
 bokeh_process1 = subprocess.Popen(
-    ['bokeh', 'serve', '--allow-websocket-origin=localhost:5000', 'lolliplotServer.py'], stdout=subprocess.PIPE)
+    ['bokeh', 'serve', '--allow-websocket-origin=51.141.52.237:5000', 'lolliplotServer.py'], stdout=subprocess.PIPE)
 bokeh_process2 = subprocess.Popen(
-    ['bokeh', 'serve', '--allow-websocket-origin=localhost:5000', '--port=5007', 'lolliplotServerDetail.py'], stdout=subprocess.PIPE)
+    ['bokeh', 'serve', '--allow-websocket-origin=51.141.52.237:5000', '--port=5007', 'lolliplotServerDetail.py'], stdout=subprocess.PIPE)
 
 @atexit.register
 def kill_server():
@@ -37,7 +37,7 @@ def kill_server():
 
 
 class IndexForm(FlaskForm):
-    filelist = glob.glob('/Users/ilektra/HHprY-Project/*.ssw11.hhr')
+    filelist = glob.glob(os.path.expanduser('~/data/*.ssw11.hhr'))
     filename = SelectField('filename',
                 choices = [(os.path.basename(f).split('.')[0], os.path.basename(f).split('.')[0]) for f in filelist])
 
@@ -56,9 +56,9 @@ def index():
 
 @app.route('/<filename>', methods=['POST','GET'])
 def load_name(filename):
-    filepath = os.path.join('/Users/ilektra/HHprY-Project',filename+'.0.ssw11.hhr')
+    filepath = os.path.join(os.path.expanduser('~/data'),filename+'.0.ssw11.hhr')
     bokeh_script = server_document(
-        url='http://localhost:5006/lolliplotServer', arguments=dict(filename=filepath))
+        url='http://51.141.52.237:5006/lolliplotServer', arguments=dict(filename=filepath))
 
     form1 = DetailForm()
     if form1.validate_on_submit():
@@ -85,9 +85,9 @@ def load_name(filename):
 
 @app.route('/<filename>/<db>')
 def load_detail(filename, db):
-    filepath = os.path.join('/Users/ilektra/HHprY-Project',filename+'.0.ssw11.hhr')
+    filepath = os.path.join(os.path.expanduser('~/data'),filename+'.0.ssw11.hhr')
     bokeh_script = server_document(
-        url='http://localhost:5007/lolliplotServerDetail', arguments=dict(filename=filepath, db=db))
+        url='http://51.141.52.237:5007/lolliplotServerDetail', arguments=dict(filename=filepath, db=db))
 
     html = render_template(
         'detail.html',
