@@ -63,7 +63,6 @@ def yeast_name_fixed(name):
     global yeast_name_map
     if len(yeast_name_map)==0:
         fill_yeast_name_map()
-    print(yeast_name_map[name], file=sys.stderr)
     return yeast_name_map[name]
 
 # Fill yeast name mapping dictionary

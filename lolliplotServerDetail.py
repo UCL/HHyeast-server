@@ -36,7 +36,7 @@ hover1 = HoverTool(
 ### Main figure
 ymax = 10
 p = figure(tools=[hover1,'save','pan','wheel_zoom'], width=1500, height=25*max(nhits,ymax),
-           x_range=(0,xmax), y_range=(min(nhits,ymax)/2+1,0), x_axis_location="above")
+           x_range=(0,xmax), y_range=(max(nhits,ymax)/2+1,0), x_axis_location="above")
 p.ygrid.visible=False
 p.yaxis.visible=False
 ### Need this callback mechanism in order to update the plots when reading new probThr
