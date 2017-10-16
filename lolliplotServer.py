@@ -18,7 +18,7 @@ cmap = LinearColorMapper(palette=pal, low=50, high=100)
 
 # Retrieving the arguments
 args = curdoc().session_context.request.arguments
-filename = args.get('filename')[0]
+filename = args.get('filename')[0].decode("utf-8")
 
 ### Read data
 prob_cutoff = 0.5
