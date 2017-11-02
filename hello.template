@@ -37,7 +37,7 @@ def kill_server():
 
 
 class IndexForm(FlaskForm):
-    filelist = glob.glob(os.path.expanduser('~/data/*.ssw11.hhr'))
+    filelist = sorted(glob.glob(os.path.expanduser('~/data/*.ssw11.hhr')))
     filename = SelectField('filename',
                 choices = [(os.path.basename(f).split('.')[0], os.path.basename(f).split('.')[0]) for f in filelist])
 
