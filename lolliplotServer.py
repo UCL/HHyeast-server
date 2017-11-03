@@ -11,8 +11,6 @@ from bokeh.models import HoverTool, CustomJS
 import numpy as np
 import dataProcessing
 
-import sys
-
 pal = palettes.viridis(10)
 cmap = LinearColorMapper(palette=pal, low=50, high=100)
 
@@ -58,15 +56,17 @@ hover = HoverTool(
 )
 
 page = column()
-ncl = 10
+ncl_ref = 10
 plots_l = []
 for dbname, nhits, ref_data, source in zip(dbname_l, nhits_l, ref_data_l, source_l):
     #print(nhits1, file=sys.stderr)
     title = 'Matches to database '+dbname
+    ncl = ncl_ref
     if nhits>=ncl:
+        x2d = np.vstack((ref_data['x1'], ref_data['dx'])).T
+        ncl = min(len(np.unique(x2d,axis=0)), ncl)
         title = title+', clustered in '+str(ncl)
         ### Cluster data
-        x2d = np.vstack((ref_data['x1'], ref_data['dx'])).T
         x1, dx, y, pcentcl, name, detail, clabels = dataProcessing.cluster_data(x2d, ref_data['pcent'], ncl)
         new_data = dict()
         new_data['x1'] = x1
@@ -83,8 +83,8 @@ for dbname, nhits, ref_data, source in zip(dbname_l, nhits_l, ref_data_l, source
         title = title+', not clustered'
 
     ### Main figure
-    p1 = figure(tools=[hover,'save','pan','wheel_zoom'], title=title, width=1500, height=25*ncl,
-                x_range=(0,xmax), y_range=(min(ncl,nhits)/2+1,0), x_axis_location="above")
+    p1 = figure(tools=[hover,'save','pan','wheel_zoom'], title=title, width=1500, height=25*ncl_ref,
+                x_range=(0,xmax), y_range=(min(ncl_ref,nhits)/2+1,0), x_axis_location="above")
     p1.ygrid.visible=False
     p1.yaxis.visible=False
     p1.y_range.callback = myCallback
