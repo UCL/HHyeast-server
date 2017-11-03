@@ -57,31 +57,34 @@ def index():
 @app.route('/<filename>', methods=['POST','GET'])
 def load_name(filename):
     filepath = os.path.join(os.path.expanduser('~/data'),filename+'.0.ssw11.hhr')
-    bokeh_script = server_document(
-        url='http://{{dnprefix}}:5006/lolliplotServer', arguments=dict(filename=filepath))
+    if os.path.isfile(filepath):
+        bokeh_script = server_document(
+            url='http://{{dnprefix}}:5006/lolliplotServer', arguments=dict(filename=filepath))
+            
+        form1 = DetailForm()
+        if form1.validate_on_submit():
+           url = url_for('load_detail', filename=filename, db='pdb')
+           return redirect(url)
+        form2 = DetailForm()
+        if form2.validate_on_submit():
+           url = url_for('load_detail', filename=filename, db='pfam')
+           return redirect(url)
+        form3 = DetailForm()
+        if form3.validate_on_submit():
+           url = url_for('load_detail', filename=filename, db='yeast')
+           return redirect(url)
 
-    form1 = DetailForm()
-    if form1.validate_on_submit():
-        url = url_for('load_detail', filename=filename, db='pdb')
-        return redirect(url)
-    form2 = DetailForm()
-    if form2.validate_on_submit():
-        url = url_for('load_detail', filename=filename, db='pfam')
-        return redirect(url)
-    form3 = DetailForm()
-    if form3.validate_on_submit():
-        url = url_for('load_detail', filename=filename, db='yeast')
-        return redirect(url)
-
-    html = render_template(
-        'plot.html',
-        plot_script=bokeh_script,
-        name=filename,
-        form1=form1,
-        form2=form2,
-        form3=form3)
-
-    return html
+        return render_template(
+               'plot.html',
+               plot_script=bokeh_script,
+               name=filename,
+               form1=form1,
+               form2=form2,
+               form3=form3)
+    else:
+        return render_template(
+            'error.html',
+            msg="Data for "+filename+" does not exist. Please choose a different ORF.")
 
 @app.route('/<filename>/<db>')
 def load_detail(filename, db):
