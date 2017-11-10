@@ -1,0 +1,19 @@
+import requests
+import time
+
+def test_orf():
+    orf = "YBR166C"
+    start = time.time()
+    response = requests.get("{{dnprefix}}:5000/"+orf,timeout=20)
+    end = time.time()
+    print (orf+" took "+str(end-start)+" s")
+    assert response.ok
+
+def test_dbs():
+    for db in ["pdb", "pfam", "yeast"]:
+        start = time.time()
+        response = requests.get("{{dnprefix}}:5000/"+orf+"/"+db,timeout=10)
+        end = time.time()
+        assert response.ok, db+" is "+str(end-start)+" too slow"
+        print(orf+" is "+str(end-start)+" too slow  oops...")
+
