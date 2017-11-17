@@ -10,7 +10,7 @@ with open("hello.py", "w") as f:
         f.write(rendered_template)
 
 rendered_template = j2_env.get_template(
-        'testing-script.template').render(dnprefix=sys.argv[1])
+        'testing-script.template').render(dnprefix=sys.argv[1], tout=sys.argv[2])
 with open("testing-script.py", "w") as f:
         f.write(rendered_template)
 
