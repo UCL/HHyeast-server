@@ -4,7 +4,7 @@ import glob
 import os
 
 def test_orf():
-    filelist = sorted(glob.glob(os.path.expanduser('~/data/*.ssw11.hhr')))[:10]
+    filelist = sorted(glob.glob(os.path.expanduser('~/data/*.ssw11.hhr')))
     maxtime = 0
     slowestORF = ''
     for file in filelist:
@@ -24,7 +24,7 @@ def test_orf():
     print ("\n Slowest ORF: "+slowestORF+" summary took "+str(maxtime)+" s")
 
 def test_dbs():
-    filelist = sorted(glob.glob(os.path.expanduser('~/data/*.ssw11.hhr')))[:10]
+    filelist = sorted(glob.glob(os.path.expanduser('~/data/*.ssw11.hhr')))
     maxtime = 0
     slowestORF = ''
     for file in filelist:
