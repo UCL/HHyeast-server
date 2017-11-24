@@ -25,7 +25,9 @@ dbname_l = []
 nhits_l = []
 ref_data_l = []
 source_l = []
-xmax, nhits, ref_data = dataProcessing.parse_file(filename, prob_cutoff, 'pdb')
+#xmax, nhits, ref_data = dataProcessing.parse_file(filename, prob_cutoff, 'pdb')
+xmax, nhitsALL, hitList = dataProcessing.parse_file(filename, prob_cutoff)
+nhits, ref_data = fill_data_dict(nhitsALL, hitlist, 'pdb')
 if nhits!=0:
     dbname_l.append('PDB')
     nhits_l.append(nhits)

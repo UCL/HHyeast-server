@@ -14,12 +14,30 @@ def parse_file(filename, prob_cutoff, db):
         if (hitList[i]).probability < prob_cutoff:
             break
         nhits += 1
+    nhitsDB, data = fill_data_dict(nhits, hitlist, db)
+
+    return xmax, nhitsDB, data
+
+def parse_file(filename, prob_cutoff):
+    hhpParser = HHpredOutputParser()
+    hitList = hhpParser.parse_file(filename)
+    xmax = hitList.match_columns
+
+    nhits = 0
+    for i in range(0,len(hitList)):
+        if (hitList[i]).probability < prob_cutoff:
+            break
+        nhits += 1
+
+    return xmax, nhits, hitlist
+
+# Read data from hitList structure
+def fill_data_dict(nhits, hitlist, db):
     x1, x2, dx, y, pcent, name, detail = fill_data(nhits, hitList, db)
     data = dict(x1=x1, x2=x2, dx=dx, y=y, name=name, pcent=pcent, detail=detail)
 
-    return xmax, len(x1), data
+    return len(x1), data
 
-# Read data from hitList structure
 def fill_data(nhits, hitList, db):
     x1 = []
     x2 = []
