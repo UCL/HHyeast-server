@@ -1,9 +1,8 @@
 {% extends "base.html" %}
 
 {% block breadcrumb_links %}
-  <li class="breadcrumb__item"><a href="https://www.ucl.ac.uk/">UCL Home</a></li>
-  <li class="breadcrumb__item"><a href="http://www.ucl.ac.uk/research-it-services">Research IT Services</a></li>
-  <li class="breadcrumb__item">Structural bioinformatics with HHYeast</li>
+  super()
+  <li class="breadcrumb__item">{{ name }}</li>
 {% endblock breadcrumb_links %}
 
 {% block content %}
