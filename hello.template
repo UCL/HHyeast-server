@@ -91,19 +91,19 @@ def load_detail(filename, db):
     filepath = os.path.join(os.path.expanduser('~/data'),filename+'.0.ssw11.hhr')
     if db=='pdb' or db=='pfam' or db=='yeast' :
 
-       if os.path.isfile(filepath):
-    	   bokeh_script = server_document(
-    	       url='http://{{dnprefix}}:5007/lolliplotServerDetail', arguments=dict(filename=filepath, db=db))
-	   return render_template(
-	       'detail.html',
-               plot_script=bokeh_script,
-               name=filename )
-       else:
-	   return render_template(
-               'error.html',
-       	       msg="Data for "+filename+" does not exist. Please choose a different ORF.")
+        if os.path.isfile(filepath):
+           bokeh_script = server_document(
+               url='http://{{dnprefix}}:5007/lolliplotServerDetail', arguments=dict(filename=filepath, db=db))
+           return render_template(
+                  'detail.html',
+                  plot_script=bokeh_script,
+                  name=filename )
+        else:
+           return render_template(
+                  'error.html',
+       	          msg="Data for "+filename+" does not exist. Please choose a different ORF.")
 
     else:
-       return render_template(
-       	   'error.html',
-           msg="Data for database "+db+" does not exist. Please choose between pdb, pfam or yeast.")
+        return render_template(
+       	       'error.html',
+               msg="Data for database "+db+" does not exist. Please choose between pdb, pfam or yeast.")

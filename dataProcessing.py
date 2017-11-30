@@ -4,21 +4,7 @@ from sklearn.cluster import KMeans
 import sys
 
 # Parse HHSearch output file up to probability cutoff
-def parse_file(filename, prob_cutoff, db):
-    hhpParser = HHpredOutputParser()
-    hitList = hhpParser.parse_file(filename)
-    xmax = hitList.match_columns
-
-    nhits = 0
-    for i in range(0,len(hitList)):
-        if (hitList[i]).probability < prob_cutoff:
-            break
-        nhits += 1
-    nhitsDB, data = fill_data_dict(nhits, hitlist, db)
-
-    return xmax, nhitsDB, data
-
-def parse_file(filename, prob_cutoff):
+def parse_file(filename, prob_cutoff, db=''):
     hhpParser = HHpredOutputParser()
     hitList = hhpParser.parse_file(filename)
     xmax = hitList.match_columns
@@ -29,10 +15,15 @@ def parse_file(filename, prob_cutoff):
             break
         nhits += 1
 
-    return xmax, nhits, hitlist
+    if not db:
+        return xmax, nhits, hitList
+    else:
+        nhitsDB, data = fill_data_dict(nhits, hitList, db)
+        return xmax, nhitsDB, data
+
 
 # Read data from hitList structure
-def fill_data_dict(nhits, hitlist, db):
+def fill_data_dict(nhits, hitList, db):
     x1, x2, dx, y, pcent, name, detail = fill_data(nhits, hitList, db)
     data = dict(x1=x1, x2=x2, dx=dx, y=y, name=name, pcent=pcent, detail=detail)
 
