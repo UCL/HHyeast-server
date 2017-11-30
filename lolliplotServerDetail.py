@@ -51,7 +51,7 @@ labels_pname = LabelSet(x='x1', y='y', text='name', source=source, text_baseline
 p.add_layout(labels_pname)
 
 ### Clustering figure
-pcl = figure(tools=['save','pan','wheel_zoom'], width=500, height=500, x_range=(0,xmax), y_range=(0,xmax))
+pcl = figure(tools=['save','pan','wheel_zoom'], width=500, height=500)
 pcl.x(x="x1", y="dx", source=source,
       color={'field': 'pcent', 'transform': cmap})
 
