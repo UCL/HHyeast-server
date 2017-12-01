@@ -34,7 +34,7 @@ for db in dbs:
         dbname_l.append(db.upper())
         nhits_l.append(nhits)
         ref_data_l.append(dict(ref_data))
-        source_l.append(ColumnDataSource( data=dict(ref_data) )) # source holds a COPY of the ref_data dict
+        source_l.append(ColumnDataSource( data=ref_data.copy() )) # source holds a COPY of the ref_data dict
 
 ### Stuff common to all plots:
 ### Need this callback mechanism in order to update the plots when reading new probThr

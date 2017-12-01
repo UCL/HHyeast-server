@@ -89,7 +89,7 @@ def load_name(filename):
 @app.route('/<filename>/<db>')
 def load_detail(filename, db):
     filepath = os.path.join(os.path.expanduser('~/data'),filename+'.0.ssw11.hhr')
-    if db=='pdb' or db=='pfam' or db=='yeast' :
+    if db in ['pdb', 'pfam', 'yeast']:
 
         if os.path.isfile(filepath):
            bokeh_script = server_document(
