@@ -25,24 +25,16 @@ dbname_l = []
 nhits_l = []
 ref_data_l = []
 source_l = []
-xmax, nhits, ref_data = dataProcessing.parse_file(filename, prob_cutoff, 'pdb')
-if nhits!=0:
-    dbname_l.append('PDB')
-    nhits_l.append(nhits)
-    ref_data_l.append(dict(ref_data))
-    source_l.append(ColumnDataSource( data=dict(ref_data) )) # source holds a COPY of the ref_data dict
-xmax, nhits, ref_data = dataProcessing.parse_file(filename, prob_cutoff, 'pfam')
-if nhits!=0:
-    dbname_l.append('PFAM')
-    nhits_l.append(nhits)
-    ref_data_l.append(dict(ref_data))
-    source_l.append(ColumnDataSource( data=dict(ref_data) )) # source holds a COPY of the ref_data dict
-xmax, nhits, ref_data = dataProcessing.parse_file(filename, prob_cutoff, 'yeast')
-if nhits!=0:
-    dbname_l.append('YEAST')
-    nhits_l.append(nhits)
-    ref_data_l.append(dict(ref_data))
-    source_l.append(ColumnDataSource( data=dict(ref_data) )) # source holds a COPY of the ref_data dict
+dbs = ['pdb', 'pfam', 'yeast']
+xmax, nhitsALL, hitList = dataProcessing.parse_file(filename, prob_cutoff) # Get all hits
+# Loop over databases
+for db in dbs:
+    nhits, ref_data = dataProcessing.fill_data_dict(nhitsALL, hitList, db)
+    if nhits!=0:
+        dbname_l.append(db.upper())
+        nhits_l.append(nhits)
+        ref_data_l.append(dict(ref_data))
+        source_l.append(ColumnDataSource( data=ref_data.copy() )) # source holds a COPY of the ref_data dict
 
 ### Stuff common to all plots:
 ### Need this callback mechanism in order to update the plots when reading new probThr

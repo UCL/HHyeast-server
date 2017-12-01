@@ -1,0 +1,45 @@
+import requests
+import time
+import glob
+import os
+
+def test_orf():
+    filelist = sorted(glob.glob(os.path.expanduser('~/data/*.ssw11.hhr')))
+    maxtime = 0
+    slowestORF = ''
+    for file in filelist:
+        orf = os.path.basename(file).split('.')[0]
+        start = time.time()
+        response = requests.get("http://{{dnprefix}}:5000/"+orf, timeout={{tout}})
+        end = time.time()
+        # Test for valid response
+        assert response.ok, "ORF "+orf+" response error."
+        # Test for timeout
+        tdiff = end-start
+        assert tdiff<{{tout}}, orf+" summary took "+str(tdiff)+" s - too slow!"
+        # Keep track of the slowest ORF
+        if tdiff>maxtime:
+            slowestORF = orf
+            maxtime = tdiff
+    print ("\n Slowest ORF: "+slowestORF+" summary took "+str(maxtime)+" s")
+
+def test_dbs():
+    filelist = sorted(glob.glob(os.path.expanduser('~/data/*.ssw11.hhr')))
+    maxtime = 0
+    slowestORF = ''
+    for file in filelist:
+        orf = os.path.basename(file).split('.')[0]
+        for db in ["pdb", "pfam", "yeast"]:
+            start = time.time()
+            response = requests.get("http://{{dnprefix}}:5000/"+orf+"/"+db, timeout={{tout}})
+            end = time.time()
+            # Test for valid response
+            assert response.ok, "ORF "+orf+" "+db+" response error."
+            # Test for timeout
+            tdiff = end-start
+            assert tdiff<{{tout}}, orf+" "+db+" summary took "+str(tdiff)+" s - too slow!"
+            # Keep track of the slowest ORF
+            if tdiff>maxtime:
+                slowestORF = orf+" "+db
+                maxtime = tdiff
+    print ("\n Slowest ORF: "+slowestORF+" took "+str(maxtime)+" s")
