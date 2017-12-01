@@ -12,17 +12,9 @@
   <div class="bk-root">
        {{ plot_script|safe }}
   </div>
-  <form action="" method="post" name="detailform1">
-       {{ form1.hidden_tag() }}
-       <input type="submit" name="detail1" value="Detailed PDB hits">
-  </form>
-  <form action="" method="post" name="detailform2">
-       {{ form2.hidden_tag() }}
-       <input type="submit" name="detail2" value="Detailed Pfam hits">
-  </form>
-  <form action="" method="post" name="detailform3">
-       {{ form3.hidden_tag() }}
-       <input type="submit" name="detail3" value="Detailed yeast hits">
-  </form>
+
+  <a class="btn" href="{{ url_for('load_detail', filename=name, db='pdb') }}">Detailed PDB hits</a>
+  <a class="btn" href="{{ url_for('load_detail', filename=name, db='pfam') }}">Detailed Pfam hits</a>
+  <a class="btn" href="{{ url_for('load_detail', filename=name, db='yeast') }}">Detailed yeast hits</a>
 {% endblock content %}
 
