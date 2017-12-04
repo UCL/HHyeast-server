@@ -24,10 +24,13 @@ def parse_file(filename, prob_cutoff, db=''):
 
 # Read data from hitList structure
 def fill_data_dict(nhits, hitList, db):
-    x1, x2, dx, y, pcent, name, detail = fill_data(nhits, hitList, db)
-    data = dict(x1=x1, x2=x2, dx=dx, y=y, name=name, pcent=pcent, detail=detail)
-
-    return len(x1), data
+    if db in ['pdb', 'pfam', 'yeast']:
+        x1, x2, dx, y, pcent, name, detail = fill_data(nhits, hitList, db)
+        data = dict(x1=x1, x2=x2, dx=dx, y=y, name=name, pcent=pcent, detail=detail)
+        
+        return len(x1), data
+    else:
+        raise ValueError("Data for database "+db+" does not exist. Please choose between pdb, pfam or yeast.")
 
 def fill_data(nhits, hitList, db):
     x1 = []
