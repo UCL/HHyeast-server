@@ -78,7 +78,8 @@ def load_detail(filename, db):
            return render_template(
                   'detail.html',
                   plot_script=bokeh_script,
-                  name=filename )
+                  name=filename,
+                  db=db )
         else:
            return render_template(
                   'error.html',

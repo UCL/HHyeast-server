@@ -90,8 +90,8 @@ try:
         plots_l.append(p1)
 
 
-        ### Page layout
-        page = column( plots_l )
+    ### Page layout
+    page = column( plots_l )
 
     curdoc().add_root(page)
 
