@@ -21,6 +21,7 @@ from bokeh.layouts import widgetbox, column, layout
 
 app = Flask(__name__)
 app.config['SECRET_KEY']='la'
+app.url_map.strict_slashes = False
 csrf = CSRFProtect(app)
 cp.setup(app)
 
