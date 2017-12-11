@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect, url_for
+from flask import Flask, render_template, redirect, url_for, abort
 import glob
 import os
 import subprocess
@@ -21,6 +21,7 @@ from bokeh.layouts import widgetbox, column, layout
 
 app = Flask(__name__)
 app.config['SECRET_KEY']='la'
+app.url_map.strict_slashes = False
 csrf = CSRFProtect(app)
 cp.setup(app)
 
@@ -51,8 +52,21 @@ def index():
         return redirect(url)
     return render_template('index.html',form=form)
 
+@app.errorhandler(406)
+def wrong_case_url(e):
+    url = ''
+    input_list = e.description.split(' ')
+    if len(input_list)==1:
+        url = url_for('load_name', filename=input_list[0].upper())
+    elif len(input_list)==2:
+        url = url_for('load_detail', filename=input_list[0].upper(), db=input_list[1].lower())
+    return redirect(url)
+
 @app.route('/<filename>', methods=['POST','GET'])
 def load_name(filename):
+    if filename!=filename.upper():
+        abort(406, filename)
+
     filepath = os.path.join(os.path.expanduser('~/data'),filename+'.0.ssw11.hhr')
     if os.path.isfile(filepath):
         bokeh_script = server_document(
@@ -69,6 +83,9 @@ def load_name(filename):
 
 @app.route('/<filename>/<db>')
 def load_detail(filename, db):
+    if filename!=filename.upper() or db!=db.lower():
+        abort(406, filename+" "+db)
+
     filepath = os.path.join(os.path.expanduser('~/data'),filename+'.0.ssw11.hhr')
     if db in ['pdb', 'pfam', 'yeast']:
 
@@ -89,3 +106,4 @@ def load_detail(filename, db):
         return render_template(
        	       'error.html',
                msg="Data for database "+db+" does not exist. Please choose between pdb, pfam or yeast.")
+               
