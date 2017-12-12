@@ -80,21 +80,15 @@ def yeast_name_fixed(name):
 # Fill yeast name mapping dictionary
 def fill_yeast_name_map():
     global yeast_name_map
-    with open("Saccharomyces_cerevisiae_S288c.fas", "r") as f:
+    with open("yeast_names_ref.txt", "r") as f:
         for line in f:
-            if line[0]!='>':
-                continue
-            words = line.split()[0:-3]
-            old_name = (words[0])[1:]
-            new_name = old_name
-            description = new_name+' '+' '.join(words[1:])
-            if len(words)==2:
-                new_name = words[1]
+            words = line.split()
+            old_name = words[0]
+            new_name = words[1]
+            description = new_name+' (hypothetical protein)'
+            if len(words)==3:
+                new_name = words[2]
                 description = new_name
-            else:
-                if words[1]=='hypothetical':
-                    new_name = words[3]
-                    description = new_name+' (hypothetical protein)'
             yeast_name_map[old_name] = new_name, description
 
 
