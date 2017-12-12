@@ -70,26 +70,46 @@ def fill_data(nhits, hitList, db):
 
 
 yeast_name_map = {}
+syst_name_map = {}
+std_name_map = {}
+# Fill name mapping dictionaries
+def fill_name_maps():
+    global yeast_name_map, syst_name_map, std_name_map
+    with open("yeast_names_ref.txt", "r") as f:
+        for line in f:
+            words = line.split()
+            yeast_name = words[0]
+            syst_name = words[1]
+            std_name = ''
+            new_name = syst_name
+            description = syst_name+' (hypothetical protein)'
+            if len(words)==3:
+                std_name = words[2]
+                new_name = std_name
+                description = std_name
+                syst_name_map[std_name] = syst_name
+            yeast_name_map[yeast_name] = new_name, description
+            std_name_map[syst_name] = std_name
+
 # Fix ORF name from yeast database
 def yeast_name_fixed(name):
     global yeast_name_map
     if len(yeast_name_map)==0:
-        fill_yeast_name_map()
+        fill_name_maps()
     return yeast_name_map[name]
 
-# Fill yeast name mapping dictionary
-def fill_yeast_name_map():
-    global yeast_name_map
-    with open("yeast_names_ref.txt", "r") as f:
-        for line in f:
-            words = line.split()
-            old_name = words[0]
-            new_name = words[1]
-            description = new_name+' (hypothetical protein)'
-            if len(words)==3:
-                new_name = words[2]
-                description = new_name
-            yeast_name_map[old_name] = new_name, description
+# Return systematic/standard name from the other
+def systematic_name(name):
+    global syst_name_map
+    if len(syst_name_map)==0:
+        fill_name_maps()
+    return syst_name_map[name]
+
+def standard_name(name):
+    global std_name_map
+    if len(std_name_map)==0:
+        fill_name_maps()
+    return std_name_map[name]
 
 
 # Active clustering: override input data per hit  with data per cluster
