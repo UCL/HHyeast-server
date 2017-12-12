@@ -1,12 +1,13 @@
-from flask import Flask, render_template, redirect, url_for, abort
+from flask import Flask, render_template, redirect, url_for, abort, request, jsonify
 import glob
 import os
+import sys
 import subprocess
 import atexit
 
 from flask_wtf import FlaskForm
 from flask_wtf.csrf import CSRFProtect
-from wtforms import SelectField, SubmitField
+from wtforms import StringField
 import context_processors as cp
 
 from bokeh.embed import server_document
@@ -37,10 +38,16 @@ def kill_server():
     bokeh_process2.kill()
 
 
-class IndexForm(FlaskForm):
+@app.route('/autocomplete', methods=['GET'])
+def autocomplete():
+    search = request.args.get('q')
     filelist = sorted(glob.glob(os.path.expanduser('~/data/*.ssw11.hhr')))
-    filename = SelectField('filename',
-                choices = [(os.path.basename(f).split('.')[0], os.path.basename(f).split('.')[0]) for f in filelist])
+    orflist = [os.path.basename(f).split('.')[0].upper() for f in filelist]
+    filteredlist = [orf for orf in orflist if orf.find(search.upper())>=0 ]
+    return jsonify(matching_results=filteredlist)
+
+class IndexForm(FlaskForm):
+    filename = StringField('autocomplete')
 
 
 @app.route('/', methods=['POST','GET'])

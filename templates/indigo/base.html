@@ -68,6 +68,29 @@
          globalSiteSpecificVars.pathToJquery = "//static.ucl.ac.uk/indigo/js/lib/jquery-2.1.1.min";
      }
     </script>
+
+    <link href="//code.jquery.com/ui/1.10.2/themes/smoothness/jquery-ui.css" rel="Stylesheet"></link>
+    <script src="//code.jquery.com/jquery-2.2.0.min.js"></script>
+    <script src="//code.jquery.com/ui/1.10.2/jquery-ui.js" ></script>
+
+    <script type="text/javascript">
+     $(function() {
+         $("#filename").autocomplete({
+             source:function(request, response) {
+                 $.getJSON("{{url_for('autocomplete')}}",{
+                     q: request.term, // in flask, "q" will be the argument to look for using request.args
+                 }, function(data) {
+                     response(data.matching_results); // matching_results from jsonify
+                 });
+             },
+             minLength: 1,
+             select: function(event, ui) {
+                 console.log(ui.item.value); // not in your question, but might help later
+             }
+         });
+     })
+
+    </script>
     {% endblock head_scripts %}
 
     {% block extra_head %}
