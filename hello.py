@@ -19,6 +19,8 @@ from bokeh.models import HoverTool, CustomJS
 from bokeh.models.widgets import Slider, Panel, Tabs, TextInput
 from bokeh.layouts import widgetbox, column, layout
 
+import dataProcessing
+
 
 app = Flask(__name__)
 app.config['SECRET_KEY']='la'
@@ -41,9 +43,13 @@ def kill_server():
 @app.route('/autocomplete', methods=['GET'])
 def autocomplete():
     search = request.args.get('q').upper()
-    filelist = sorted(glob.glob(os.path.expanduser('~/data/*.ssw11.hhr')))
-    orflist = [os.path.basename(f).split('.')[0].upper() for f in filelist]
-    filteredlist = [orf for orf in orflist if search in orf]
+    filelist = glob.glob(os.path.expanduser('~/data/*.ssw11.hhr'))
+    orflist = []
+    for f in filelist:
+        syst_name = os.path.basename(f).split('.')[0].upper()
+        std_name = dataProcessing.standard_name(syst_name)
+        orflist.append( std_name+"/"+syst_name if std_name else syst_name)
+    filteredlist = [orf for orf in sorted(orflist) if search in orf]
     return jsonify(matching_results=filteredlist)
 
 class IndexForm(FlaskForm):
@@ -57,11 +63,13 @@ def index():
     form = IndexForm()
     if form.validate_on_submit():
         filename = form.filename.data
+        filenameSYST = filename.split('/')[-1]
+        filenameSTD = dataProcessing.standard_name(filenameSYST)
         if form.display.data:
-            url = url_for('load_name',filename=filename)
+            url = url_for('load_name',filename=filenameSTD)
             return redirect(url)
         else:
-            return send_from_directory(os.path.expanduser('~/data'),filename+'.0.ssw11.hhr',as_attachment=True)
+            return send_from_directory(os.path.expanduser('~/data'),filenameSYST+'.0.ssw11.hhr',as_attachment=True)
     return render_template('index.html',form=form)
 
 @app.errorhandler(406)
@@ -79,7 +87,7 @@ def load_name(filename):
     if filename!=filename.upper():
         abort(406, filename)
 
-    filepath = os.path.join(os.path.expanduser('~/data'),filename+'.0.ssw11.hhr')
+    filepath = os.path.join(os.path.expanduser('~/data'),dataProcessing.systematic_name(filename)+'.0.ssw11.hhr')
     if os.path.isfile(filepath):
         bokeh_script = server_document(
             url='http://localhost:5006/lolliplotServer', arguments=dict(filename=filepath))
@@ -98,7 +106,7 @@ def load_detail(filename, db):
     if filename!=filename.upper() or db!=db.lower():
         abort(406, filename+" "+db)
 
-    filepath = os.path.join(os.path.expanduser('~/data'),filename+'.0.ssw11.hhr')
+    filepath = os.path.join(os.path.expanduser('~/data'),dataProcessing.systematic_name(filename)+'.0.ssw11.hhr')
     if db in ['pdb', 'pfam', 'yeast']:
 
         if os.path.isfile(filepath):
