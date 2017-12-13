@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect, url_for, abort, request, jsonify
+from flask import Flask, render_template, redirect, url_for, abort, request, jsonify, send_from_directory
 import glob
 import os
 import sys
@@ -7,7 +7,7 @@ import atexit
 
 from flask_wtf import FlaskForm
 from flask_wtf.csrf import CSRFProtect
-from wtforms import StringField
+from wtforms import StringField, SubmitField
 import context_processors as cp
 
 from bokeh.embed import server_document
@@ -48,6 +48,8 @@ def autocomplete():
 
 class IndexForm(FlaskForm):
     filename = StringField('autocomplete')
+    display = SubmitField(label='Display plot')
+    download = SubmitField(label='Download file')
 
 
 @app.route('/', methods=['POST','GET'])
@@ -55,8 +57,11 @@ def index():
     form = IndexForm()
     if form.validate_on_submit():
         filename = form.filename.data
-        url = url_for('load_name',filename=filename)
-        return redirect(url)
+        if form.display.data:
+            url = url_for('load_name',filename=filename)
+            return redirect(url)
+        else:
+            return send_from_directory(os.path.expanduser('~/data'),filename+'.0.ssw11.hhr',as_attachment=True)
     return render_template('index.html',form=form)
 
 @app.errorhandler(406)
