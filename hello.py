@@ -70,7 +70,7 @@ def index():
         filenameSYST = filename.split('/')[-1]
         filenameSTD = dataProcessing.standard_name(filenameSYST)
         if form.display.data:
-            url = url_for('load_name',filename=filenameSTD)
+            url = url_for('load_name',filename=(filenameSTD if filenameSTD else filenameSYST))
             return redirect(url)
         else:
             return send_from_directory(os.path.expanduser('~/data'),filenameSYST+'.0.ssw11.hhr',as_attachment=True)
@@ -104,10 +104,12 @@ def syst_name_in_url(e):
 def load_name(filename):
     if filename!=filename.upper():
         abort(406, filename)
-    if dataProcessing.standard_name(filename):
+    if dataProcessing.standard_name(filename): # is systematic name AND has a standard name
         abort(410, filename)
 
-    filepath = os.path.join(os.path.expanduser('~/data'),dataProcessing.systematic_name(filename)+'.0.ssw11.hhr')
+    if dataProcessing.systematic_name(filename): # is standard name
+        filename = dataProcessing.systematic_name(filename)
+    filepath = os.path.join(os.path.expanduser('~/data'),filename+'.0.ssw11.hhr')
     if os.path.isfile(filepath):
         bokeh_script = server_document(
             url='http://localhost:5006/lolliplotServer', arguments=dict(filename=filepath))
