@@ -3,10 +3,13 @@
 To install package: `pip3 install -r requirements.txt`
 
 To run the server locally: `bokeh serve --show lolliplotServerStandalone.py`
-  (note this is an outdated version of the server)
+  (note this is a very outdated version of the server)
 
-To generate hello.py with the correct IP: `python3 populate_hello.py <yourIPhere>`
-  To run locally, you can use `localhost` for the IP. Otherwise, give the IP of the (virtual) machine you're running on.
+To generate hello.py and other files from the templates, with the correct IP and other parameters: 
+`python3 populate_templates.py <yourIPhere> <timeoutForTests>`
+For example, to run locally with a timeout of 30s for the tests:
+`python3 populate_templates.py localhost 30` 
+If you're not running locally, give the IP of the (virtual) machine you're running on.
 
 To run the flask application: 
 ```
