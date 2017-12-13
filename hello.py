@@ -22,6 +22,7 @@ from bokeh.layouts import widgetbox, column, layout
 import dataProcessing
 
 
+# Configure flask stuff
 app = Flask(__name__)
 app.config['SECRET_KEY']='la'
 app.url_map.strict_slashes = False
@@ -29,6 +30,7 @@ csrf = CSRFProtect(app)
 cp.setup(app)
 
 
+# Start bokeh servers
 bokeh_process1 = subprocess.Popen(
     ['bokeh', 'serve', '--allow-websocket-origin=localhost:5000', 'lolliplotServer.py'], stdout=subprocess.PIPE)
 bokeh_process2 = subprocess.Popen(
@@ -40,6 +42,7 @@ def kill_server():
     bokeh_process2.kill()
 
 
+# Functions/classes needed for index page
 @app.route('/autocomplete', methods=['GET'])
 def autocomplete():
     search = request.args.get('q').upper()
@@ -58,6 +61,7 @@ class IndexForm(FlaskForm):
     download = SubmitField(label='Download file')
 
 
+# Index page
 @app.route('/', methods=['POST','GET'])
 def index():
     form = IndexForm()
@@ -72,6 +76,8 @@ def index():
             return send_from_directory(os.path.expanduser('~/data'),filenameSYST+'.0.ssw11.hhr',as_attachment=True)
     return render_template('index.html',form=form)
 
+
+# Custom error handlers
 @app.errorhandler(406)
 def wrong_case_url(e):
     url = ''
@@ -82,10 +88,24 @@ def wrong_case_url(e):
         url = url_for('load_detail', filename=input_list[0].upper(), db=input_list[1].lower())
     return redirect(url)
 
+@app.errorhandler(410)
+def syst_name_in_url(e):
+    url = ''
+    input_list = e.description.split(' ')
+    if len(input_list)==1:
+        url = url_for( 'load_name', filename=dataProcessing.standard_name(input_list[0].upper()) )
+    elif len(input_list)==2:
+        url = url_for('load_detail', filename=dataProcessing.standard_name(input_list[0].upper()), db=input_list[1].lower())
+    return redirect(url)
+
+
+# Summary page
 @app.route('/<filename>', methods=['POST','GET'])
 def load_name(filename):
     if filename!=filename.upper():
         abort(406, filename)
+    if dataProcessing.standard_name(filename):
+        abort(410, filename)
 
     filepath = os.path.join(os.path.expanduser('~/data'),dataProcessing.systematic_name(filename)+'.0.ssw11.hhr')
     if os.path.isfile(filepath):
@@ -101,10 +121,14 @@ def load_name(filename):
             'error.html',
             msg="Data for "+filename+" does not exist. Please choose a different ORF.")
 
+
+# Detail page
 @app.route('/<filename>/<db>')
 def load_detail(filename, db):
     if filename!=filename.upper() or db!=db.lower():
         abort(406, filename+" "+db)
+    if dataProcessing.standard_name(filename):
+        abort(410, filename+" "+db)
 
     filepath = os.path.join(os.path.expanduser('~/data'),dataProcessing.systematic_name(filename)+'.0.ssw11.hhr')
     if db in ['pdb', 'pfam', 'yeast']:
