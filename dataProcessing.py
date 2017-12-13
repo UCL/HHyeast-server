@@ -96,20 +96,20 @@ def yeast_name_fixed(name):
     global yeast_name_map
     if len(yeast_name_map)==0:
         fill_name_maps()
-    return yeast_name_map[name]
+    return yeast_name_map[name] if name in yeast_name_map else ''
 
 # Return systematic/standard name from the other
 def systematic_name(name):
     global syst_name_map
     if len(syst_name_map)==0:
         fill_name_maps()
-    return syst_name_map[name]
+    return syst_name_map[name] if name in syst_name_map else ''
 
 def standard_name(name):
     global std_name_map
     if len(std_name_map)==0:
         fill_name_maps()
-    return std_name_map[name]
+    return std_name_map[name] if name in std_name_map else ''
 
 
 # Active clustering: override input data per hit  with data per cluster
