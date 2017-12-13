@@ -12,7 +12,8 @@
     <form action="" method="post" name="fileform">
         {{ form.hidden_tag() }}
         {{ form.filename }}
-        <input type="submit" value="Display plot">
+        {{ form.display }}
+        {{ form.download }}
     </form>
     {% endblock content %}
 

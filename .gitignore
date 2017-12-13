@@ -1,6 +1,5 @@
 *~
 src/
 __pycache__/
-hello.py
 testing-script.py
 Dockerfile
