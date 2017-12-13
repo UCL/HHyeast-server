@@ -40,10 +40,10 @@ def kill_server():
 
 @app.route('/autocomplete', methods=['GET'])
 def autocomplete():
-    search = request.args.get('q')
+    search = request.args.get('q').upper()
     filelist = sorted(glob.glob(os.path.expanduser('~/data/*.ssw11.hhr')))
     orflist = [os.path.basename(f).split('.')[0].upper() for f in filelist]
-    filteredlist = [orf for orf in orflist if orf.find(search.upper())>=0 ]
+    filteredlist = [orf for orf in orflist if search in orf]
     return jsonify(matching_results=filteredlist)
 
 class IndexForm(FlaskForm):
