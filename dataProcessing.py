@@ -96,20 +96,46 @@ def yeast_name_fixed(name):
     global yeast_name_map
     if len(yeast_name_map)==0:
         fill_name_maps()
-    return yeast_name_map[name] if name in yeast_name_map else ''
+    return yeast_name_map[name] if name in yeast_name_map else name
 
-# Return systematic/standard name from the other
-def systematic_name(name):
-    global syst_name_map
-    if len(syst_name_map)==0:
-        fill_name_maps()
-    return syst_name_map[name] if name in syst_name_map else ''
-
-def standard_name(name):
+# Check if name is systematic/standard name
+def is_systematic_name(name):
     global std_name_map
     if len(std_name_map)==0:
         fill_name_maps()
-    return std_name_map[name] if name in std_name_map else ''
+    return name in std_name_map
+
+def is_standard_name(name):
+    global syst_name_map
+    if len(syst_name_map)==0:
+        fill_name_maps()
+    return name in syst_name_map
+
+def is_hypothetical_protein(name):
+    return is_systematic_name(name) and not standard_name(name)
+
+def is_unknown_protein(name):
+    # This function is needed because the yeast name reference file is not complete,
+    # in order to treat legitimate but missing ORF's properly.
+    # TODO: Fix the reference file!
+    return not is_systematic_name(name) and not is_standard_name(name)
+
+# Return systematic/standard name from the other
+def systematic_name(name):
+    if is_systematic_name(name):
+        return name
+    global syst_name_map
+    if len(syst_name_map)==0:
+        fill_name_maps()
+    return syst_name_map[name] if is_standard_name(name) else ''
+
+def standard_name(name):
+    if is_standard_name(name):
+        return name
+    global std_name_map
+    if len(std_name_map)==0:
+        fill_name_maps()
+    return std_name_map[name] if is_systematic_name(name) else ''
 
 
 # Active clustering: override input data per hit  with data per cluster

@@ -19,7 +19,7 @@ from bokeh.models import HoverTool, CustomJS
 from bokeh.models.widgets import Slider, Panel, Tabs, TextInput
 from bokeh.layouts import widgetbox, column, layout
 
-import dataProcessing
+import dataProcessing as dp
 
 
 # Configure flask stuff
@@ -50,8 +50,12 @@ def autocomplete():
     orflist = []
     for f in filelist:
         syst_name = os.path.basename(f).split('.')[0].upper()
-        std_name = dataProcessing.standard_name(syst_name)
-        orflist.append( std_name+"/"+syst_name if std_name else syst_name)
+        std_name = dp.standard_name(syst_name)
+        # TODO: When the reference file is complete, use following line instead
+        # orflist.append( syst_name if dp.is_hypothetical_protein(syst_name) else std_name+"/"+syst_name )
+        orflist.append( syst_name
+                        if (dp.is_hypothetical_protein(syst_name) or dp.is_unknown_protein(syst_name))
+                        else std_name+"/"+syst_name )
     filteredlist = [orf for orf in sorted(orflist) if search in orf]
     return jsonify(matching_results=filteredlist)
 
@@ -68,9 +72,12 @@ def index():
     if form.validate_on_submit():
         filename = form.filename.data
         filenameSYST = filename.split('/')[-1]
-        filenameSTD = dataProcessing.standard_name(filenameSYST)
         if form.display.data:
-            url = url_for('load_name',filename=(filenameSTD if filenameSTD else filenameSYST))
+            # TODO: When the reference file is complete, use following line instead
+            # url = url_for('load_name',filename=(filenameSYST if dp.is_hypothetical_protein(filenameSYST) else dp.standard_name(filenameSYST)))
+            url = url_for( 'load_name',filename=(filenameSYST
+                                                 if (dp.is_hypothetical_protein(filenameSYST) or dp.is_unknown_protein(filenameSYST))
+                                                 else dp.standard_name(filenameSYST)) )
             return redirect(url)
         else:
             return send_from_directory(os.path.expanduser('~/data'),filenameSYST+'.0.ssw11.hhr',as_attachment=True)
@@ -93,9 +100,9 @@ def syst_name_in_url(e):
     url = ''
     input_list = e.description.split(' ')
     if len(input_list)==1:
-        url = url_for( 'load_name', filename=dataProcessing.standard_name(input_list[0].upper()) )
+        url = url_for( 'load_name', filename=dp.standard_name(input_list[0].upper()) )
     elif len(input_list)==2:
-        url = url_for('load_detail', filename=dataProcessing.standard_name(input_list[0].upper()), db=input_list[1].lower())
+        url = url_for('load_detail', filename=dp.standard_name(input_list[0].upper()), db=input_list[1].lower())
     return redirect(url)
 
 
@@ -104,12 +111,13 @@ def syst_name_in_url(e):
 def load_name(filename):
     if filename!=filename.upper():
         abort(406, filename)
-    if dataProcessing.standard_name(filename): # is systematic name AND has a standard name
+    if dp.is_systematic_name(filename) and not dp.is_hypothetical_protein(filename) :
         abort(410, filename)
 
-    if dataProcessing.systematic_name(filename): # is standard name
-        filename = dataProcessing.systematic_name(filename)
-    filepath = os.path.join(os.path.expanduser('~/data'),filename+'.0.ssw11.hhr')
+    filepath = os.path.join(os.path.expanduser('~/data'),dp.systematic_name(filename)+'.0.ssw11.hhr')
+    # TODO: When the reference file is complete, remove the following
+    if dp.is_unknown_protein(filename):
+        filepath = os.path.join(os.path.expanduser('~/data'),filename+'.0.ssw11.hhr')
     if os.path.isfile(filepath):
         bokeh_script = server_document(
             url='http://localhost:5006/lolliplotServer', arguments=dict(filename=filepath))
@@ -129,10 +137,13 @@ def load_name(filename):
 def load_detail(filename, db):
     if filename!=filename.upper() or db!=db.lower():
         abort(406, filename+" "+db)
-    if dataProcessing.standard_name(filename):
+    if dp.is_systematic_name(filename) and not dp.is_hypothetical_protein(filename) :
         abort(410, filename+" "+db)
 
-    filepath = os.path.join(os.path.expanduser('~/data'),dataProcessing.systematic_name(filename)+'.0.ssw11.hhr')
+    filepath = os.path.join(os.path.expanduser('~/data'),dp.systematic_name(filename)+'.0.ssw11.hhr')
+    # TODO: When the reference file is complete, remove the following
+    if dp.is_unknown_protein(filename):
+        filepath = os.path.join(os.path.expanduser('~/data'),filename+'.0.ssw11.hhr')
     if db in ['pdb', 'pfam', 'yeast']:
 
         if os.path.isfile(filepath):
