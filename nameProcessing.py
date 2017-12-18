@@ -1,0 +1,80 @@
+# Classes and tools to process protein names
+
+class NameMaps():
+    def __init__(self):
+        self._yeast = {}
+        self._syst = {}
+        self._std = {}
+
+    @property
+    def yeast(self):
+        if not self._yeast:
+            self._fill_maps()
+        return self._yeast
+
+    @property
+    def syst(self):
+        if not self._syst:
+            self._fill_maps()
+        return self._syst
+
+    @property
+    def std(self):
+        if not self._std:
+            self._fill_maps()
+        return self._std
+
+    # Fill name mapping dictionaries
+    def _fill_maps(self):
+        with open("yeast_names_ref.txt", "r") as f:
+            for line in f:
+                words = line.split()
+                yeast_name = words[0]
+                syst_name = words[1]
+                if len(words)==3:
+                    std_name = words[2]
+                    new_name = std_name
+                    description = std_name
+                    self._syst[std_name] = syst_name
+                else:
+                    std_name = ''
+                    new_name = syst_name
+                    description = syst_name+' (hypothetical protein)'
+                self._yeast[yeast_name] = new_name, description
+                self._std[syst_name] = std_name
+
+
+name_maps = NameMaps()
+
+# Fix ORF name from yeast database
+def yeast_name_fixed(name):
+    return name_maps.yeast.get(name,name)
+
+# Check if name is systematic/standard name
+def is_systematic_name(name):
+    return name in name_maps.std
+
+def is_standard_name(name):
+    return name in name_maps.syst
+
+def is_hypothetical_protein(name):
+    return is_systematic_name(name) and not standard_name(name)
+
+def is_unknown_protein(name):
+    # This function is needed because the yeast name reference file is not complete,
+    # in order to treat legitimate but missing ORF's properly.
+    # TODO: Fix the reference file!
+    return not is_systematic_name(name) and not is_standard_name(name)
+
+# Return systematic/standard name from the other
+def systematic_name(name):
+    if is_systematic_name(name):
+        return name
+    return name_maps.syst.get(name,'')
+
+def standard_name(name):
+    if is_standard_name(name):
+        return name
+    return name_maps.std.get(name,'')
+
+

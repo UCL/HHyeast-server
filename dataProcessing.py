@@ -3,6 +3,8 @@ from sklearn.cluster import KMeans
 
 import sys
 
+import nameProcessing
+
 # Parse HHSearch output file up to probability cutoff
 def parse_file(filename, prob_cutoff, db=''):
     hhpParser = HHpredOutputParser()
@@ -49,7 +51,7 @@ def fill_data(nhits, hitList, db):
             if db!='yeast':
                 continue
             else:
-                fixed = yeast_name_fixed(hit.id)
+                fixed = nameProcessing.yeast_name_fixed(hit.id)
                 hit.id = fixed[0]
                 if hasattr(hit,'name'):
                     hit.name = fixed[1]
@@ -67,76 +69,6 @@ def fill_data(nhits, hitList, db):
             detail.append("no detail")
 
     return x1, x2, dx, y, pcent, name, detail
-
-
-yeast_name_map = {}
-syst_name_map = {}
-std_name_map = {}
-# Fill name mapping dictionaries
-def fill_name_maps():
-    global yeast_name_map, syst_name_map, std_name_map
-    with open("yeast_names_ref.txt", "r") as f:
-        for line in f:
-            words = line.split()
-            yeast_name = words[0]
-            syst_name = words[1]
-            if len(words)==3:
-                std_name = words[2]
-                new_name = std_name
-                description = std_name
-                syst_name_map[std_name] = syst_name
-            else:
-                std_name = ''
-                new_name = syst_name
-                description = syst_name+' (hypothetical protein)'
-            yeast_name_map[yeast_name] = new_name, description
-            std_name_map[syst_name] = std_name
-
-# Fix ORF name from yeast database
-def yeast_name_fixed(name):
-    global yeast_name_map
-    if not yeast_name_map:
-        fill_name_maps()
-    return yeast_name_map.get(name,name)
-
-# Check if name is systematic/standard name
-def is_systematic_name(name):
-    global std_name_map
-    if not std_name_map:
-        fill_name_maps()
-    return name in std_name_map
-
-def is_standard_name(name):
-    global syst_name_map
-    if not syst_name_map:
-        fill_name_maps()
-    return name in syst_name_map
-
-def is_hypothetical_protein(name):
-    return is_systematic_name(name) and not standard_name(name)
-
-def is_unknown_protein(name):
-    # This function is needed because the yeast name reference file is not complete,
-    # in order to treat legitimate but missing ORF's properly.
-    # TODO: Fix the reference file!
-    return not is_systematic_name(name) and not is_standard_name(name)
-
-# Return systematic/standard name from the other
-def systematic_name(name):
-    if is_systematic_name(name):
-        return name
-    global syst_name_map
-    if not syst_name_map:
-        fill_name_maps()
-    return syst_name_map.get(name,'')
-
-def standard_name(name):
-    if is_standard_name(name):
-        return name
-    global std_name_map
-    if not std_name_map:
-        fill_name_maps()
-    return std_name_map.get(name,'')
 
 
 # Active clustering: override input data per hit  with data per cluster
