@@ -61,20 +61,32 @@ def is_hypothetical_protein(name):
     return is_systematic_name(name) and not standard_name(name)
 
 def is_unknown_protein(name):
-    # This function is needed because the yeast name reference file is not complete,
-    # in order to treat legitimate but missing ORF's properly.
-    # TODO: Fix the reference file!
     return not is_systematic_name(name) and not is_standard_name(name)
 
 # Return systematic/standard name from the other
 def systematic_name(name):
-    if is_systematic_name(name):
-        return name
-    return name_maps.syst.get(name,'')
+    return name_maps.syst.get(name,name)
 
 def standard_name(name):
-    if is_standard_name(name):
-        return name
-    return name_maps.std.get(name,'')
+    return name_maps.std.get(name,name)
 
+# Return a single name for a protein. For now, the convention is:
+# standard name if it exists, the same name as the argument if it's
+# a hypothetical or unknown protein
+def single_name(name):
+    # TODO: When the reference file is complete, use following line instead
+    # if is_hypothetical_protein(syst_name):
+    if is_hypothetical_protein(name) or is_unknown_protein(name):
+        return name
+    else:
+        return standard_name(name)
+
+# Return the name to be displayed in the drop-down list
+def display_name(name):
+    # TODO: When the reference file is complete, use following line instead
+    # if is_hypothetical_protein(syst_name):
+    if is_hypothetical_protein(name) or is_unknown_protein(name):
+        return name
+    else:
+        return standard_name(name)+"/"+systematic_name(name)
 

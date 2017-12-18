@@ -49,13 +49,8 @@ def autocomplete():
     filelist = glob.glob(os.path.expanduser('~/data/*.ssw11.hhr'))
     orflist = []
     for f in filelist:
-        syst_name = os.path.basename(f).split('.')[0].upper()
-        std_name = np.standard_name(syst_name)
-        # TODO: When the reference file is complete, use following line instead
-        # orflist.append( syst_name if np.is_hypothetical_protein(syst_name) else std_name+"/"+syst_name )
-        orflist.append( syst_name
-                        if (np.is_hypothetical_protein(syst_name) or np.is_unknown_protein(syst_name))
-                        else std_name+"/"+syst_name )
+        name = os.path.basename(f).split('.')[0].upper()
+        orflist.append( np.display_name(name) )
     filteredlist = [orf for orf in sorted(orflist) if search in orf]
     return jsonify(matching_results=filteredlist)
 
@@ -71,16 +66,12 @@ def index():
     form = IndexForm()
     if form.validate_on_submit():
         filename = form.filename.data
-        filenameSYST = filename.split('/')[-1]
+        name = filename.split('/')[-1]
         if form.display.data:
-            # TODO: When the reference file is complete, use following line instead
-            # url = url_for('load_name',filename=(filenameSYST if np.is_hypothetical_protein(filenameSYST) else np.standard_name(filenameSYST)))
-            url = url_for( 'load_name',filename=(filenameSYST
-                                                 if (np.is_hypothetical_protein(filenameSYST) or np.is_unknown_protein(filenameSYST))
-                                                 else np.standard_name(filenameSYST)) )
+            url = url_for( 'load_name',filename=(np.single_name(name)) )
             return redirect(url)
         else:
-            return send_from_directory(os.path.expanduser('~/data'),filenameSYST+'.0.ssw11.hhr',as_attachment=True)
+            return send_from_directory(os.path.expanduser('~/data'),np.systematic_name(name)+'.0.ssw11.hhr',as_attachment=True)
     return render_template('index.html',form=form)
 
 
@@ -115,9 +106,6 @@ def load_name(filename):
         abort(410, filename)
 
     filepath = os.path.join(os.path.expanduser('~/data'),np.systematic_name(filename)+'.0.ssw11.hhr')
-    # TODO: When the reference file is complete, remove the following
-    if np.is_unknown_protein(filename):
-        filepath = os.path.join(os.path.expanduser('~/data'),filename+'.0.ssw11.hhr')
     if os.path.isfile(filepath):
         bokeh_script = server_document(
             url='http://localhost:5006/lolliplotServer', arguments=dict(filename=filepath))
@@ -141,9 +129,6 @@ def load_detail(filename, db):
         abort(410, filename+" "+db)
 
     filepath = os.path.join(os.path.expanduser('~/data'),np.systematic_name(filename)+'.0.ssw11.hhr')
-    # TODO: When the reference file is complete, remove the following
-    if np.is_unknown_protein(filename):
-        filepath = os.path.join(os.path.expanduser('~/data'),filename+'.0.ssw11.hhr')
     if db in ['pdb', 'pfam', 'yeast']:
 
         if os.path.isfile(filepath):
