@@ -57,9 +57,11 @@ def is_systematic_name(name):
 def is_standard_name(name):
     return name in name_maps.syst
 
+# A hypothetical protein has a systematic name but no standard name
 def is_hypothetical_protein(name):
     return is_systematic_name(name) and not standard_name(name)
 
+# An unknown protein has neither a systematic nor a standard name
 def is_unknown_protein(name):
     return not is_systematic_name(name) and not is_standard_name(name)
 
