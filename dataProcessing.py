@@ -80,34 +80,35 @@ def fill_name_maps():
             words = line.split()
             yeast_name = words[0]
             syst_name = words[1]
-            std_name = ''
-            new_name = syst_name
-            description = syst_name+' (hypothetical protein)'
             if len(words)==3:
                 std_name = words[2]
                 new_name = std_name
                 description = std_name
                 syst_name_map[std_name] = syst_name
+            else:
+                std_name = ''
+                new_name = syst_name
+                description = syst_name+' (hypothetical protein)'
             yeast_name_map[yeast_name] = new_name, description
             std_name_map[syst_name] = std_name
 
 # Fix ORF name from yeast database
 def yeast_name_fixed(name):
     global yeast_name_map
-    if len(yeast_name_map)==0:
+    if not yeast_name_map:
         fill_name_maps()
-    return yeast_name_map[name] if name in yeast_name_map else name
+    return yeast_name_map.get(name,name)
 
 # Check if name is systematic/standard name
 def is_systematic_name(name):
     global std_name_map
-    if len(std_name_map)==0:
+    if not std_name_map:
         fill_name_maps()
     return name in std_name_map
 
 def is_standard_name(name):
     global syst_name_map
-    if len(syst_name_map)==0:
+    if not syst_name_map:
         fill_name_maps()
     return name in syst_name_map
 
@@ -125,17 +126,17 @@ def systematic_name(name):
     if is_systematic_name(name):
         return name
     global syst_name_map
-    if len(syst_name_map)==0:
+    if not syst_name_map:
         fill_name_maps()
-    return syst_name_map[name] if is_standard_name(name) else ''
+    return syst_name_map.get(name,'')
 
 def standard_name(name):
     if is_standard_name(name):
         return name
     global std_name_map
-    if len(std_name_map)==0:
+    if not std_name_map:
         fill_name_maps()
-    return std_name_map[name] if is_systematic_name(name) else ''
+    return std_name_map.get(name,'')
 
 
 # Active clustering: override input data per hit  with data per cluster
