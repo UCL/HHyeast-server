@@ -51,12 +51,6 @@ try:
     labels_pname = LabelSet(x='x1', y='y', text='name', source=source, text_baseline='middle')
     p.add_layout(labels_pname)
 
-    ### Clustering figure
-    pcl = figure(tools=['save','pan','wheel_zoom'], width=500, height=500)
-    pcl.x(x="x1", y="dx", source=source,
-          color={'field': 'pcent', 'transform': cmap})
-
-
     ### Slider widget
     ncl_slider = Slider(start=0, end=10, value=0, step=1, title="Number of clusters")
     ### Data-slider interaction
@@ -90,8 +84,7 @@ try:
 
 
     ### Page layout
-    page = gridplot( [ [widgetbox(ncl_slider, threshold_text), pcl ],
-                                  [p] ] )
+    page = gridplot( [widgetbox(ncl_slider, threshold_text)], [p] )
     curdoc().add_root(page)
 
 except Exception as e:
