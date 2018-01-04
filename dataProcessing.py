@@ -29,6 +29,7 @@ def fill_data_dict(nhits, hitList, db):
     if db in ['pdb', 'pfam', 'yeast']:
         x1, x2, dx, y, pcent, name, detail = fill_data(nhits, hitList, db)
         data = dict(x1=x1, x2=x2, dx=dx, y=y, name=name, pcent=pcent, detail=detail)
+        data = squash_data(data)
         
         return len(x1), data
     else:
@@ -69,6 +70,22 @@ def fill_data(nhits, hitList, db):
             detail.append("no detail")
 
     return x1, x2, dx, y, pcent, name, detail
+
+
+# Squash y-coordinate of data for compact view
+def squash_data(data):
+    for i in range(len(data['x1'])):
+        for j in range(i):
+            if data['x2'][j]<data['x1'][i] or data['x1'][j]>data['x2'][i]:
+                data['y'][i] = data['y'][j]
+                isGap = True
+                for k in range(j+1,i):
+                    if data['y'][k]==data['y'][j]:
+                        isGap = False
+                        break
+                if isGap:
+                    break
+    return data
 
 
 # Active clustering: override input data per hit  with data per cluster
