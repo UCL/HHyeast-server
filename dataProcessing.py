@@ -74,17 +74,19 @@ def fill_data(nhits, hitList, db):
 
 # Squash y-coordinate of data for compact view
 def squash_data(data):
-    for i in range(len(data['x1'])):
-        for j in range(i):
-            if data['x2'][j]<data['x1'][i] or data['x1'][j]>data['x2'][i]:
-                data['y'][i] = data['y'][j]
-                isGap = True
-                for k in range(j+1,i):
-                    if data['y'][k]==data['y'][j]:
+    nhits = len(data['x1'])
+    for i in range(nhits): # loop over hits
+        for j in range(nhits): # loop over y positions
+            y = float(j+1)/2.
+            isGap = True
+            for k in range(nhits): # loop over hits in this y position
+                if k!=i and data['y'][k]==y:
+                    if data['x2'][k]>data['x1'][i] and data['x1'][k]<data['x2'][i]:
                         isGap = False
                         break
-                if isGap:
-                    break
+            if isGap:
+                data['y'][i] = y
+                break
     return data
 
 
