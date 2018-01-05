@@ -63,10 +63,11 @@ def fill_data(nhits, hitList, db):
         y.append(float(len(y)+1)/2.)
         pcent.append(100*hit.probability)
         name.append(hit.id+' : {:.2f}%'.format(pcent[-1]))
+        tHMM = " ("+str(hit.start)+","+str(hit.end)+")"
         if hasattr(hit,'name'):
-            detail.append(hit.name)
+            detail.append(hit.name+tHMM)
         else :
-            detail.append("no detail")
+            detail.append(hit.id+tHMM)
 
     return x1, x2, dx, y, pcent, name, detail
 
