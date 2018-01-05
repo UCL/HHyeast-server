@@ -28,7 +28,7 @@ def parse_file(filename, prob_cutoff, db=''):
 def fill_data_dict(nhits, hitList, db):
     if db in ['pdb', 'pfam', 'yeast']:
         x1, x2, dx, y, pcent, name, detail = fill_data(nhits, hitList, db)
-        data = dict(x1=x1, x2=x2, dx=dx, y=y, name=name, pcent=pcent, detail=detail)
+        data = dict(x1=x1, x2=x2, xm=[beg+dif/2 for beg,dif in zip(x1,dx)], dx=dx, y=y, name=name, pcent=pcent, detail=detail)
         data, ymax = squash_data(data)
         
         return ymax, data
@@ -76,13 +76,14 @@ def fill_data(nhits, hitList, db):
 def squash_data(data):
     nhits = len(data['x1'])
     ymax = data['y'][0]
+    gap = 5
     for i in range(nhits): # loop over hits
         for j in range(nhits): # loop over y positions
             y = float(j+1)/2.
             isGap = True
             for k in range(nhits): # loop over hits in this y position
                 if k!=i and data['y'][k]==y:
-                    if data['x2'][k]>data['x1'][i] and data['x1'][k]<data['x2'][i]:
+                    if data['x2'][k]>data['x1'][i]-gap and data['x1'][k]<data['x2'][i]+gap:
                         isGap = False
                         break
             if isGap:
