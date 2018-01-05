@@ -46,8 +46,8 @@ try:
     """)
     # Tooltip
     hover = HoverTool(
-        tooltips = [ ("match No", "$index"),
-                     ("description", "@detail") ]
+        tooltips = [ ("Cluster", "$index"),
+                     ("Highest probability hit", "@detail") ]
     )
 
     page = column()
@@ -62,7 +62,7 @@ try:
             ncl = min(len(np.unique(x2d,axis=0)), ncl)
             title = title+', clustered in '+str(ncl)
             ### Cluster data
-            x1, dx, y, pcentcl, name, detail, clabels = dataProcessing.cluster_data(x2d, ref_data['pcent'], ncl)
+            x1, dx, y, pcentcl, name, detail, clabels = dataProcessing.cluster_data(x2d, ref_data['pcent'], ref_data['detail'], ncl)
             new_data = dict()
             new_data['x1'] = x1
             new_data['x2'] = x1+dx

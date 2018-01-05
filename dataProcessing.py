@@ -73,7 +73,7 @@ def fill_data(nhits, hitList, db):
 
 
 # Active clustering: override input data per hit  with data per cluster
-def cluster_data(x2d, pcent, n_clust):
+def cluster_data(x2d, pcent, detail, n_clust):
     kmeans = KMeans(n_clusters=n_clust, random_state=77)
     c_labels = kmeans.fit_predict(x2d)
     c_centers = kmeans.cluster_centers_
@@ -90,9 +90,9 @@ def cluster_data(x2d, pcent, n_clust):
         for j in range(0,nhits):
             if c_labels[j]==i:
                 pcentcl.append(pcent[j])
+                detailcl.append(detail[j])
                 break
         namecl.append(str(pcentcl[i])+'%')
-        detailcl.append('Some detail...')
 
     return x1cl, x2cl, ycl, pcentcl, namecl, detailcl, c_labels
 
