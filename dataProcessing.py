@@ -27,8 +27,8 @@ def parse_file(filename, prob_cutoff, db=''):
 # Read data from hitList structure
 def fill_data_dict(nhits, hitList, db):
     if db in ['pdb', 'pfam', 'yeast']:
-        x1, x2, dx, y, pcent, name, detail = fill_data(nhits, hitList, db)
-        data = dict(x1=x1, x2=x2, dx=dx, y=y, name=name, pcent=pcent, detail=detail)
+        x1, x2, dx, x1t, x2t, y, pcent, name, detail = fill_data(nhits, hitList, db)
+        data = dict(x1=x1, x2=x2, dx=dx, x1t=x1t, x2t=x2t, y=y, name=name, pcent=pcent, detail=detail)
         
         return len(x1), data
     else:
@@ -38,6 +38,8 @@ def fill_data(nhits, hitList, db):
     x1 = []
     x2 = []
     dx = []
+    x1t = []
+    x2t = []
     y = []
     pcent = []
     name = []
@@ -60,16 +62,17 @@ def fill_data(nhits, hitList, db):
         x1.append(hit.qstart)
         x2.append(hit.qend)
         dx.append(hit.qend-hit.qstart)
+        x1t.append(hit.start)
+        x2t.append(hit.end)
         y.append(float(len(y)+1)/2.)
         pcent.append(100*hit.probability)
         name.append(hit.id+' : {:.2f}%'.format(pcent[-1]))
-        tHMM = " ("+str(hit.start)+","+str(hit.end)+")"
         if hasattr(hit,'name'):
-            detail.append(hit.name+tHMM)
+            detail.append(hit.name)
         else :
-            detail.append(hit.id+tHMM)
+            detail.append(hit.id)
 
-    return x1, x2, dx, y, pcent, name, detail
+    return x1, x2, dx, x1t, x2t, y, pcent, name, detail
 
 
 # Active clustering: override input data per hit  with data per cluster

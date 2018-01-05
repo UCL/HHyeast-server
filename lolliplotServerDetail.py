@@ -30,8 +30,9 @@ try:
 
     ### Tooltip
     hover1 = HoverTool(
-        tooltips = [ ("Query", "@x1-@x2"),
-                     ("Hit", "@detail") ]
+        tooltips = [ ("Hit", "@detail"),
+                     ("Query HMM", "@x1-@x2"),
+                     ("Template HMM", "@x1t-@x2t") ]
         )
 
     ### Main figure
