@@ -27,8 +27,9 @@ def parse_file(filename, prob_cutoff, db=''):
 # Read data from hitList structure
 def fill_data_dict(nhits, hitList, db):
     if db in ['pdb', 'pfam', 'yeast']:
-        x1, x2, dx, y, pcent, name, detail = fill_data(nhits, hitList, db)
-        data = dict(x1=x1, x2=x2, xm=[beg+dif/2 for beg,dif in zip(x1,dx)], dx=dx, y=y, name=name, pcent=pcent, detail=detail)
+        x1, x2, dx, x1t, x2t, y, pcent, name, detail = fill_data(nhits, hitList, db)
+        data = dict(x1=x1, x2=x2, xm=[beg+dif/2 for beg,dif in zip(x1,dx)], dx=dx, x1t=x1t, x2t=x2t,
+                    y=y, name=name, pcent=pcent, detail=detail)
         data, ymax = squash_data(data)
         
         return ymax, data
@@ -39,6 +40,8 @@ def fill_data(nhits, hitList, db):
     x1 = []
     x2 = []
     dx = []
+    x1t = []
+    x2t = []
     y = []
     pcent = []
     name = []
@@ -61,15 +64,17 @@ def fill_data(nhits, hitList, db):
         x1.append(hit.qstart)
         x2.append(hit.qend)
         dx.append(hit.qend-hit.qstart)
+        x1t.append(hit.start)
+        x2t.append(hit.end)
         y.append(float(len(y)+1)/2.)
         pcent.append(100*hit.probability)
         name.append(hit.id+' : {:.2f}%'.format(pcent[-1]))
         if hasattr(hit,'name'):
             detail.append(hit.name)
         else :
-            detail.append("no detail")
+            detail.append(hit.id)
 
-    return x1, x2, dx, y, pcent, name, detail
+    return x1, x2, dx, x1t, x2t, y, pcent, name, detail
 
 
 # Squash y-coordinate of data for compact view
@@ -94,7 +99,7 @@ def squash_data(data):
 
 
 # Active clustering: override input data per hit  with data per cluster
-def cluster_data(x2d, pcent, n_clust):
+def cluster_data(x2d, pcent, detail, n_clust):
     kmeans = KMeans(n_clusters=n_clust, random_state=77)
     c_labels = kmeans.fit_predict(x2d)
     c_centers = kmeans.cluster_centers_
@@ -111,9 +116,9 @@ def cluster_data(x2d, pcent, n_clust):
         for j in range(0,nhits):
             if c_labels[j]==i:
                 pcentcl.append(pcent[j])
+                detailcl.append(detail[j])
                 break
         namecl.append(str(pcentcl[i])+'%')
-        detailcl.append('Some detail...')
 
     return x1cl, x2cl, ycl, pcentcl, namecl, detailcl, c_labels
 
