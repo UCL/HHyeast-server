@@ -28,9 +28,11 @@ def parse_file(filename, prob_cutoff, db=''):
 def fill_data_dict(nhits, hitList, db):
     if db in ['pdb', 'pfam', 'yeast']:
         x1, x2, dx, x1t, x2t, y, pcent, name, detail = fill_data(nhits, hitList, db)
-        data = dict(x1=x1, x2=x2, dx=dx, x1t=x1t, x2t=x2t, y=y, name=name, pcent=pcent, detail=detail)
+        data = dict(x1=x1, x2=x2, xm=[beg+dif/2 for beg,dif in zip(x1,dx)], dx=dx, x1t=x1t, x2t=x2t,
+                    y=y, name=name, pcent=pcent, detail=detail)
+        ymax, data = squash_data(data)
         
-        return len(x1), data
+        return ymax, data
     else:
         raise ValueError("Data for database "+db+" does not exist. Please choose between pdb, pfam or yeast.")
 
@@ -49,6 +51,7 @@ def fill_data(nhits, hitList, db):
         if (hit.id)[0:2]=='PF':
             if db!='pfam':
                 continue
+            hit.id = hit.id.split('.')[0]
         elif (hit.id)[0:3]=='NP_':
             if db!='yeast':
                 continue
@@ -66,13 +69,34 @@ def fill_data(nhits, hitList, db):
         x2t.append(hit.end)
         y.append(float(len(y)+1)/2.)
         pcent.append(100*hit.probability)
-        name.append(hit.id+' : {:.2f}%'.format(pcent[-1]))
+        name.append(hit.id+' : {:d}%'.format(int(pcent[-1])))
         if hasattr(hit,'name'):
             detail.append(hit.name)
-        else :
+        else:
             detail.append(hit.id)
 
     return x1, x2, dx, x1t, x2t, y, pcent, name, detail
+
+
+# Squash y-coordinate of data for compact view
+def squash_data(data):
+    nhits = len(data['x1'])
+    ymax = data['y'][0]
+    gap = 5
+    for i in range(nhits): # loop over hits
+        for j in range(nhits): # loop over y positions
+            y = float(j+1)/2.
+            isGap = True
+            for k in range(nhits): # loop over hits in this y position
+                if k!=i and data['y'][k]==y:
+                    if data['x2'][k]>data['x1'][i]-gap and data['x1'][k]<data['x2'][i]+gap:
+                        isGap = False
+                        break
+            if isGap:
+                data['y'][i] = y
+                break
+        ymax = max(ymax,data['y'][i])
+    return int(ymax*2.), data
 
 
 # Active clustering: override input data per hit  with data per cluster
@@ -95,7 +119,7 @@ def cluster_data(x2d, pcent, detail, n_clust):
                 pcentcl.append(pcent[j])
                 detailcl.append(detail[j])
                 break
-        namecl.append(str(pcentcl[i])+'%')
+        namecl.append(str(int(pcentcl[i]))+'%')
 
     return x1cl, x2cl, ycl, pcentcl, namecl, detailcl, c_labels
 
