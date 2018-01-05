@@ -29,9 +29,9 @@ def fill_data_dict(nhits, hitList, db):
     if db in ['pdb', 'pfam', 'yeast']:
         x1, x2, dx, y, pcent, name, detail = fill_data(nhits, hitList, db)
         data = dict(x1=x1, x2=x2, dx=dx, y=y, name=name, pcent=pcent, detail=detail)
-        data = squash_data(data)
+        data, ymax = squash_data(data)
         
-        return len(x1), data
+        return ymax, data
     else:
         raise ValueError("Data for database "+db+" does not exist. Please choose between pdb, pfam or yeast.")
 
@@ -75,6 +75,7 @@ def fill_data(nhits, hitList, db):
 # Squash y-coordinate of data for compact view
 def squash_data(data):
     nhits = len(data['x1'])
+    ymax = data['y'][0]
     for i in range(nhits): # loop over hits
         for j in range(nhits): # loop over y positions
             y = float(j+1)/2.
@@ -87,7 +88,8 @@ def squash_data(data):
             if isGap:
                 data['y'][i] = y
                 break
-    return data
+        ymax = max(ymax,data['y'][i])
+    return data, int(ymax*2.)
 
 
 # Active clustering: override input data per hit  with data per cluster
