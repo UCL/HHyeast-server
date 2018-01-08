@@ -24,12 +24,10 @@ def parse_file(filename, prob_cutoff, db=''):
         return xmax, nhitsDB, data
 
 
-# Read data from hitList structure
+# Fill data dictionary from hitList structure and do some post-processing
 def fill_data_dict(nhits, hitList, db):
     if db in ['pdb', 'pfam', 'yeast']:
-        x1, x2, dx, x1t, x2t, y, pcent, name, detail, hasLongHits = fill_data(nhits, hitList, db)
-        data = dict(x1=x1, x2=x2, xm=[beg+dif/2 for beg,dif in zip(x1,dx)], dx=dx, x1t=x1t, x2t=x2t,
-                    y=y, name=name, pcent=pcent, detail=detail)
+        data, hasLongHits = fill_data(nhits, hitList, db)
         if hasLongHits:
             data = filter_short_hits(data)
         ymax, data = squash_data(data)
@@ -38,10 +36,20 @@ def fill_data_dict(nhits, hitList, db):
     else:
         raise ValueError("Data for database "+db+" does not exist. Please choose between pdb, pfam or yeast.")
 
+# These globals control the filtering of short hits:
+# Taking into account only hits with probability<prob_cutoff,
+# - if there are any hits with length>=min_hit_length2, filter out all hits with length<min_hit_length2
+# - if not, filter out all hits with length<min_hit_length1, i.e. keep min_hit_length1 <= length < min_hit_length2
+#
+# According to this logic, the really short hits (length<min_hit_length1) are always filtered out.
+# Therefore, this part of the filtering, as well as some of the length<min_hit_length2 one if appropriate, 
+# is done pre-emptively inside fill_data, in order to speed-up execution. The rest of the filtering,
+# if needed, is done in the separate function filter_short_hits.
 min_hit_length1 = 20
 min_hit_length2 = 30
 prob_cutoff = 0.99
 
+# Fill data dictionary from hitList structure
 def fill_data(nhits, hitList, db):
     x1 = []
     x2 = []
@@ -53,9 +61,10 @@ def fill_data(nhits, hitList, db):
     name = []
     detail = []
     hasLongHits = False
+
     for i in range(0,nhits):
         hit = hitList[i]
-        # Filter out short hits
+        # Pre-filter out some short hits
         if hit.qend-hit.qstart<min_hit_length1:
             continue
         if hasLongHits and hit.qend-hit.qstart<min_hit_length2:
@@ -91,7 +100,10 @@ def fill_data(nhits, hitList, db):
         if hit.probability<prob_cutoff and hit.qend-hit.qstart>=min_hit_length2:
             hasLongHits = True
 
-    return x1, x2, dx, x1t, x2t, y, pcent, name, detail, hasLongHits
+    data = dict(x1=x1, x2=x2, xm=[beg+dif/2 for beg,dif in zip(x1,dx)], dx=dx, x1t=x1t, x2t=x2t,
+                y=y, name=name, pcent=pcent, detail=detail)
+
+    return data, hasLongHits
 
 
 # Filter out short hits from data dictionary
