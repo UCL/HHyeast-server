@@ -1,5 +1,6 @@
 from csb.bio.io import HHpredOutputParser
 from sklearn.cluster import KMeans
+import numpy as np
 
 import sys
 
@@ -138,7 +139,7 @@ def squash_data(data):
 
 
 # Active clustering: override input data per hit  with data per cluster
-def cluster_data(x2d, pcent, detail, n_clust):
+def cluster_data(x2d, data, n_clust):
     kmeans = KMeans(n_clusters=n_clust, random_state=77)
     c_labels = kmeans.fit_predict(x2d)
     c_centers = kmeans.cluster_centers_
@@ -154,10 +155,10 @@ def cluster_data(x2d, pcent, detail, n_clust):
         ycl.append(float(i+1)/2.)
         for j in range(0,nhits):
             if c_labels[j]==i:
-                pcentcl.append(pcent[j])
-                detailcl.append(detail[j])
+                pcentcl.append(data['pcent'][j])
+                namecl.append(data['name'][j])
+                detailcl.append(data['detail'][j])
                 break
-        namecl.append(str(int(pcentcl[i]))+'%')
 
     return x1cl, x2cl, ycl, pcentcl, namecl, detailcl, c_labels
 
