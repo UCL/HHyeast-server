@@ -2,9 +2,6 @@
 
 To install package: `pip3 install -r requirements.txt`
 
-To run the server locally: `bokeh serve --show lolliplotServerStandalone.py`
-  (note this is a very outdated version of the server)
-
 To generate hello.py and other files from the templates, with the correct IP and other parameters: 
 `python3 populate_templates.py <yourIPhere> <timeoutForTests>`
 For example, to run locally with a timeout of 30s for the tests:
