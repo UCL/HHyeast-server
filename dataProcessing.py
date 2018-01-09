@@ -151,6 +151,8 @@ def cluster_data(x2d, data, n_clust):
     pcentcl = []
     namecl = []
     detailcl = []
+    x1tcl = []
+    x2tcl = []
     for i in range(0,n_clust):
         ycl.append(float(i+1)/2.)
         for j in range(0,nhits):
@@ -158,9 +160,14 @@ def cluster_data(x2d, data, n_clust):
                 pcentcl.append(data['pcent'][j])
                 namecl.append(data['name'][j])
                 detailcl.append(data['detail'][j])
+                x1tcl.append(data['x1t'][j])
+                x2tcl.append(data['x2t'][j])
                 break
 
-    return x1cl, x2cl, ycl, pcentcl, namecl, detailcl, c_labels
+    new_data = dict(x1=x1cl, x2=x1cl+x2cl, xm=[beg+dif/2 for beg,dif in zip(x1cl,x2cl)], dx=x2cl, x1t=x1tcl, x2t=x2tcl,
+                    y=ycl, name=namecl, pcent=pcentcl, detail=detailcl)
+
+    return new_data
 
 # Passive clustering: return cluster labels only
 def cluster_data_pred(x2d, n_clust):

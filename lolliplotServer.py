@@ -62,18 +62,8 @@ try:
             ncl = min(len(np.unique(x2d,axis=0)), ncl)
             title = title+', clustered in '+str(ncl)
             ### Cluster data
-            x1, dx, y, pcentcl, name, detail, clabels = dataProcessing.cluster_data(x2d, ref_data, ncl)
-            new_data = dict()
-            new_data['x1'] = x1
-            new_data['x2'] = x1+dx
-            new_data['dx'] = dx
-            new_data['y'] = y
-            new_data['name'] = name
-            new_data['pcent'] = pcentcl
-            new_data['detail'] = detail
-            new_data['cluster'] = [1]*ncl
+            new_data = dataProcessing.cluster_data(x2d, ref_data, ncl)
             source.data = new_data
-            ref_data['cluster'] = clabels*100./float(ncl)
         else:
             title = title+', not clustered'
 
