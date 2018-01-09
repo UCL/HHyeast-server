@@ -145,8 +145,8 @@ def cluster_data(x2d, data, n_clust):
     c_centers = kmeans.cluster_centers_
 
     nhits = x2d.shape[0]
-    x1cl = c_centers[:,0]
-    x2cl = c_centers[:,1]
+    x1cl = [int(x) for x in c_centers[:,0]]
+    x2cl = [int(x) for x in c_centers[:,1]]
     ycl = []
     pcentcl = []
     namecl = []
@@ -164,7 +164,8 @@ def cluster_data(x2d, data, n_clust):
                 x2tcl.append(data['x2t'][j])
                 break
 
-    new_data = dict(x1=x1cl, x2=x1cl+x2cl, xm=[beg+dif/2 for beg,dif in zip(x1cl,x2cl)], dx=x2cl, x1t=x1tcl, x2t=x2tcl,
+    new_data = dict(x1=x1cl, x2=[beg+dif for beg,dif in zip(x1cl,x2cl)], xm=[beg+dif/2 for beg,dif in zip(x1cl,x2cl)],
+                    dx=x2cl, x1t=x1tcl, x2t=x2tcl,
                     y=ycl, name=namecl, pcent=pcentcl, detail=detailcl)
 
     return new_data

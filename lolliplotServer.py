@@ -46,8 +46,9 @@ try:
     """)
     # Tooltip
     hover = HoverTool(
-        tooltips = [ ("Cluster", "$index"),
-                     ("Highest probability hit", "@detail") ]
+        tooltips = [ ("Cluster limits", "@x1-@x2"),
+                     ("Highest probability hit", "@detail"),
+                     ("Template HMM", "@x1t-@x2t") ]
     )
 
     page = column()
