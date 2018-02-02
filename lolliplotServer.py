@@ -69,7 +69,7 @@ try:
             title = title+', not clustered'
 
         ### Main figure
-        p1 = figure(tools=[hover,'save','pan','wheel_zoom'], title=title, width=1500, height=25*ncl_ref,
+        p1 = figure(tools=[hover,'save','xpan','wheel_zoom','reset'], title=title, width=1500, height=25*ncl_ref,
                     x_range=(0,xmax), y_range=(min(ncl_ref,nhits)/2+1,0), x_axis_location="above")
         p1.ygrid.visible=False
         p1.yaxis.visible=False
