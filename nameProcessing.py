@@ -72,12 +72,15 @@ def systematic_name(name):
 def standard_name(name):
     return name_maps.std.get(name,name)
 
-# Return a single name for a protein. For now, the convention is:
+# The reference file cannot be guaranteed to be complete, but
+# the responsibility of what to do with ORF's not in it
+# falls on the user. Therefore in the following, let
+# unknown proteins pass through keeping their name.
+
+# Return a single name for a protein. The convention is:
 # standard name if it exists, the same name as the argument if it's
-# a hypothetical or unknown protein
+# a hypothetical or unknown protein.
 def single_name(name):
-    # TODO: When the reference file is complete, use following line instead
-    # if is_hypothetical_protein(syst_name):
     if is_hypothetical_protein(name) or is_unknown_protein(name):
         return name
     else:
@@ -85,8 +88,6 @@ def single_name(name):
 
 # Return the name to be displayed in the drop-down list
 def display_name(name):
-    # TODO: When the reference file is complete, use following line instead
-    # if is_hypothetical_protein(syst_name):
     if is_hypothetical_protein(name) or is_unknown_protein(name):
         return name
     else:

@@ -50,7 +50,8 @@ def autocomplete():
     orflist = []
     for f in filelist:
         name = os.path.basename(f).split('.')[0].upper()
-        orflist.append( np.display_name(name) )
+        if np.is_systematic_name(name): # Accept only ORF's in the standard list
+            orflist.append( np.display_name(name) )
     filteredlist = [orf for orf in sorted(orflist) if search in orf]
     return jsonify(matching_results=filteredlist)
 
@@ -105,6 +106,11 @@ def load_name(filename):
     if np.is_systematic_name(filename) and not np.is_hypothetical_protein(filename) :
         abort(410, filename)
 
+    if np.is_unknown_protein(filename): # Accept only ORF's in the standard list
+        return render_template(
+            'error.html',
+            msg=filename+" is not a valid ORF. Please choose a different one.")
+
     filepath = os.path.join(os.path.expanduser('~/data'),np.systematic_name(filename)+'.0.ssw11.hhr')
     if os.path.isfile(filepath):
         bokeh_script = server_document(
@@ -127,6 +133,11 @@ def load_detail(filename, db):
         abort(406, filename+" "+db)
     if np.is_systematic_name(filename) and not np.is_hypothetical_protein(filename) :
         abort(410, filename+" "+db)
+
+    if np.is_unknown_protein(filename): # Accept only ORF's in the standard list
+        return render_template(
+            'error.html',
+            msg=filename+" is not a valid ORF. Please choose a different one.")
 
     filepath = os.path.join(os.path.expanduser('~/data'),np.systematic_name(filename)+'.0.ssw11.hhr')
     if db in ['pdb', 'pfam', 'yeast']:
