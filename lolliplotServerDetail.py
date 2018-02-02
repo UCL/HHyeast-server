@@ -32,7 +32,7 @@ try:
     hover = HoverTool(
         tooltips = [ ("Hit", "@detail"),
                      ("Query HMM", "@x1-@x2"),
-                     ("Template HMM", "@x1t-@x2t") ]
+                     ("Template HMM", "@x1t-@x2t (@dxt)") ]
         )
 
     ### Main figure

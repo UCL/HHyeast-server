@@ -48,7 +48,7 @@ try:
     hover = HoverTool(
         tooltips = [ ("Cluster limits", "@x1-@x2"),
                      ("Highest probability hit", "@detail"),
-                     ("Template HMM", "@x1t-@x2t") ]
+                     ("Template HMM", "@x1t-@x2t (@dxt)") ]
     )
 
     page = column()

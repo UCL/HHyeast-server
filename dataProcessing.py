@@ -56,6 +56,7 @@ def fill_data(nhits, hitList, db):
     dx = []
     x1t = []
     x2t = []
+    dxt = []
     y = []
     pcent = []
     name = []
@@ -90,6 +91,7 @@ def fill_data(nhits, hitList, db):
         dx.append(hit.qend-hit.qstart)
         x1t.append(hit.start)
         x2t.append(hit.end)
+        dxt.append(hit.slength)
         y.append(float(len(y)+1)/2.)
         pcent.append(100*hit.probability)
         name.append(hit.id+' : {:d}%'.format(int(pcent[-1])))
@@ -100,7 +102,7 @@ def fill_data(nhits, hitList, db):
         if hit.probability<prob_cutoff and hit.qend-hit.qstart>=min_hit_length2:
             hasLongHits = True
 
-    data = dict(x1=x1, x2=x2, xm=[beg+dif/2 for beg,dif in zip(x1,dx)], dx=dx, x1t=x1t, x2t=x2t,
+    data = dict(x1=x1, x2=x2, xm=[beg+dif/2 for beg,dif in zip(x1,dx)], dx=dx, x1t=x1t, x2t=x2t, dxt=dxt,
                 y=y, name=name, pcent=pcent, detail=detail)
 
     return data, hasLongHits
@@ -152,6 +154,7 @@ def cluster_data(x2d, data, n_clust):
     detailcl = []
     x1tcl = []
     x2tcl = []
+    dxtcl = []
     for i in range(0,n_clust):
         ycl.append(float(i+1)/2.)
         for j in range(0,nhits):
@@ -161,10 +164,11 @@ def cluster_data(x2d, data, n_clust):
                 detailcl.append(data['detail'][j])
                 x1tcl.append(data['x1t'][j])
                 x2tcl.append(data['x2t'][j])
+                dxtcl.append(data['dxt'][j])
                 break
 
     new_data = dict(x1=x1cl, x2=[beg+dif for beg,dif in zip(x1cl,x2cl)], xm=[beg+dif/2 for beg,dif in zip(x1cl,x2cl)],
-                    dx=x2cl, x1t=x1tcl, x2t=x2tcl,
+                    dx=x2cl, x1t=x1tcl, x2t=x2tcl, dxt=dxtcl,
                     y=ycl, name=namecl, pcent=pcentcl, detail=detailcl)
 
     return new_data
