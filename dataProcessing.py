@@ -28,9 +28,11 @@ def parse_file(filename, prob_cutoff, db=''):
 def fill_data_dict(nhits, hitList, db):
     if db in ['pdb', 'pfam', 'yeast']:
         data, hasLongHits = fill_data(nhits, hitList, db)
-        if hasLongHits:
-            data = filter_short_hits(data)
-        ymax, data = squash_data(data)
+        ymax = 0
+        if data['x1']: # non-empty dictionary
+            if hasLongHits:
+                data = filter_short_hits(data)
+            ymax, data = squash_data(data)
         
         return ymax, data
     else:
