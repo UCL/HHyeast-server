@@ -138,28 +138,36 @@ def squash_data(data):
 
 
 # Active clustering: override input data per hit  with data per cluster
-def cluster_data(x2d, pcent, detail, n_clust):
+def cluster_data(x2d, data, n_clust):
     kmeans = KMeans(n_clusters=n_clust, random_state=77)
     c_labels = kmeans.fit_predict(x2d)
     c_centers = kmeans.cluster_centers_
 
     nhits = x2d.shape[0]
-    x1cl = c_centers[:,0]
-    x2cl = c_centers[:,1]
+    x1cl = [int(x) for x in c_centers[:,0]]
+    x2cl = [int(x) for x in c_centers[:,1]]
     ycl = []
     pcentcl = []
     namecl = []
     detailcl = []
+    x1tcl = []
+    x2tcl = []
     for i in range(0,n_clust):
         ycl.append(float(i+1)/2.)
         for j in range(0,nhits):
             if c_labels[j]==i:
-                pcentcl.append(pcent[j])
-                detailcl.append(detail[j])
+                pcentcl.append(data['pcent'][j])
+                namecl.append(data['name'][j])
+                detailcl.append(data['detail'][j])
+                x1tcl.append(data['x1t'][j])
+                x2tcl.append(data['x2t'][j])
                 break
-        namecl.append(str(int(pcentcl[i]))+'%')
 
-    return x1cl, x2cl, ycl, pcentcl, namecl, detailcl, c_labels
+    new_data = dict(x1=x1cl, x2=[beg+dif for beg,dif in zip(x1cl,x2cl)], xm=[beg+dif/2 for beg,dif in zip(x1cl,x2cl)],
+                    dx=x2cl, x1t=x1tcl, x2t=x2tcl,
+                    y=ycl, name=namecl, pcent=pcentcl, detail=detailcl)
+
+    return new_data
 
 # Passive clustering: return cluster labels only
 def cluster_data_pred(x2d, n_clust):
