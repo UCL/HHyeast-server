@@ -1,6 +1,5 @@
 from csb.bio.io import HHpredOutputParser
 from sklearn.cluster import KMeans
-import numpy as np
 
 import sys
 
