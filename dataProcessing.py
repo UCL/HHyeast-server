@@ -121,6 +121,9 @@ def filter_short_hits(data):
 # Squash y-coordinate of data for compact view
 def squash_data(data):
     nhits = len(data['x1'])
+    if nhits==0:
+        return 0, data
+
     ymax = data['y'][0]
     gap = 5
     for i in range(nhits): # loop over hits
