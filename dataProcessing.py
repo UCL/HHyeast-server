@@ -28,11 +28,9 @@ def parse_file(filename, prob_cutoff, db=''):
 def fill_data_dict(nhits, hitList, db):
     if db in ['pdb', 'pfam', 'yeast']:
         data, hasLongHits = fill_data(nhits, hitList, db)
-        ymax = 0
-        if data['x1']: # non-empty dictionary
-            if hasLongHits:
-                data = filter_short_hits(data)
-            ymax, data = squash_data(data)
+        if hasLongHits:
+            data = filter_short_hits(data)
+        ymax, data = squash_data(data)
         
         return ymax, data
     else:
@@ -123,6 +121,9 @@ def filter_short_hits(data):
 # Squash y-coordinate of data for compact view
 def squash_data(data):
     nhits = len(data['x1'])
+    if nhits==0:
+        return 0, data
+
     ymax = data['y'][0]
     gap = 5
     for i in range(nhits): # loop over hits
