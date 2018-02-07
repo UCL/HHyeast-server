@@ -4,6 +4,7 @@ from sklearn.cluster import KMeans
 import sys
 
 import nameProcessing
+from clustering import Clustering
 
 # Parse HHSearch output file up to probability cutoff
 def parse_file(filename, prob_cutoff, db=''):
@@ -183,5 +184,10 @@ def cluster_data_pred(x2d, n_clust):
 
     return c_labels
 
+def cluster_pred(x1l, x2l):
+    cl = Clustering()
+    c_labels, ncl = cl.passive(x1l, x2l)
+
+    return c_labels, ncl
 
 

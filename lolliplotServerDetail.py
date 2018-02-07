@@ -62,8 +62,8 @@ try:
         if ncl==0:
             source.data = ref_data
         else:
-            x2d = np.vstack((ref_data['x1'], ref_data['dx'])).T
-            clabels = dataProcessing.cluster_data_pred(x2d, ncl)
+            clabels_l, ncl = dataProcessing.cluster_pred(ref_data['x1'], ref_data['x2'])
+            clabels = np.array(clabels_l)
             source.data['pcent'] = (clabels+1)*100./float(ncl)
             cmap.low = 0
     ncl_slider.on_change("value", slider_handler)
