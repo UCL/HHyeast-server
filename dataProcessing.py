@@ -2,6 +2,7 @@ from csb.bio.io import HHpredOutputParser
 from sklearn.cluster import KMeans
 
 import sys
+import os
 
 import nameProcessing
 from clustering import Clustering
@@ -21,14 +22,15 @@ def parse_file(filename, prob_cutoff, db=''):
     if not db:
         return xmax, nhits, hitList
     else:
-        nhitsDB, data = fill_data_dict(nhits, hitList, db)
+        protein = os.path.basename(filename).decode("utf-8").split('.')[0].upper()
+        nhitsDB, data = fill_data_dict(nhits, hitList, db, protein)
         return xmax, nhitsDB, data
 
 
 # Fill data dictionary from hitList structure and do some post-processing
-def fill_data_dict(nhits, hitList, db):
+def fill_data_dict(nhits, hitList, db, protein):
     if db in ['pdb', 'pfam', 'yeast']:
-        data, hasLongHits = fill_data(nhits, hitList, db)
+        data, hasLongHits = fill_data(nhits, hitList, db, protein)
         if hasLongHits:
             data = filter_short_hits(data)
         ymax, data = squash_data(data)
@@ -51,7 +53,7 @@ min_hit_length2 = 30
 prob_cutoff = 0.99
 
 # Fill data dictionary from hitList structure
-def fill_data(nhits, hitList, db):
+def fill_data(nhits, hitList, db, protein):
     x1 = []
     x2 = []
     dx = []
@@ -85,6 +87,9 @@ def fill_data(nhits, hitList, db):
                 if hasattr(hit,'name'):
                     hit.name = fixed[1]
         elif db!='pdb':
+            continue
+        # Get rid of hits with the same name as current protein
+        if nameProcessing.systematic_name(hit.id)==protein or (hasattr(hit,'name') and hit.name.find(nameProcessing.standard_name(protein))>=0):
             continue
         # Fill data lists
         x1.append(hit.qstart)
