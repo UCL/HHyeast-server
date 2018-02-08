@@ -186,8 +186,8 @@ def cluster_data_pred(x2d, n_clust):
 
 def cluster_pred(x1l, x2l):
     cl = Clustering()
-    c_labels, ncl = cl.passive(x1l, x2l)
+    cl.fill_clusters(x1l, x2l)
 
-    return c_labels, ncl
+    return cl.clabels, cl.ncl
 
 
