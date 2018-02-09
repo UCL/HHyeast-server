@@ -45,18 +45,35 @@ class Clustering:
     # If yes, re-calculate cluster limits, increment its hit count, and return the cluster id.
     # If no, add new cluster and return the new cluster id.
     def _cluster_id(self, x1, x2):
+        o_clusters = ()
         for i in range(len(self._ncl)):
-            if self._overlap(x1, x2, self._x1cl[i], self._x2cl[i])==Overlap.FULL:
-                self._x1cl[i] = min(self._x1cl[i],x1)
-                self._x2cl[i] = max(self._x2cl[i],x2)
-                self._ncl[i] += 1
-                return i
+            overlaps, o_ratio = self._overlap(x1, x2, self._x1cl[i], self._x2cl[i])
+            if overlaps==Overlap.FULL:
+                o_clusters = (o_ratio, i)
+                break
+            elif overlaps==Overlap.PARTIAL:
+                if (o_clusters and o_clusters[0]<o_ratio) or not o_clusters:
+                    o_clusters = (o_ratio, i)
+        if o_clusters:
+            i = o_clusters[1]
+            self._x1cl[i] = min(self._x1cl[i],x1)
+            self._x2cl[i] = max(self._x2cl[i],x2)
+            self._ncl[i] += 1
+            return i
         self._x1cl.append(x1)
         self._x2cl.append(x2)
         self._ncl.append(1)
         return len(self._ncl)-1
 
     def _overlap(self, x1, x2, x1cl, x2cl):
-        dx_min = min(x2-x1, x2cl-x1cl)
-        if (x2-x1cl>self._ov_min2*dx_min and x2<=x2cl) or (x2cl-x1>self._ov_min2*dx_min and x2>x2cl):
-            return Overlap.FULL
+        dx_min = float(min(x2-x1, x2cl-x1cl))
+        if x2<=x2cl:
+            o_ratio = float(x2-x1cl)/dx_min
+        else:
+            o_ratio = float(x2cl-x1)/dx_min
+        if o_ratio>self._ov_min2:
+            return Overlap.FULL, o_ratio
+        elif o_ratio<self._ov_min1:
+            return Overlap.ZERO, o_ratio
+        else:
+            return Overlap.PARTIAL, o_ratio
