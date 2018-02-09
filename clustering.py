@@ -14,8 +14,9 @@ class Clustering:
         self._x2cl = []
         self._ncl = []
         self._clabels = []
-        self._ov_min1 = 0.1 # Below this, there's no overlap
-        self._ov_min2 = 0.5 # Above this, there's definitely overlap
+        self._ov_min = 10. # Below this number of overlapping residues, there's no overlap
+        self._ov_min1 = 0.1 # Below this overlap ratio (if it's larger than _ov_min residues), there's no overlap
+        self._ov_min2 = 0.5 # Above this overlap ratio, there's definitely overlap
 
     def _clean(self):
         self._x1cl = []
@@ -73,7 +74,7 @@ class Clustering:
             o_ratio = float(x2cl-x1)/dx_min
         if o_ratio>self._ov_min2:
             return Overlap.FULL, o_ratio
-        elif o_ratio<self._ov_min1:
+        elif o_ratio<max(self._ov_min1,self._ov_min/dx_min):
             return Overlap.ZERO, o_ratio
         else:
             return Overlap.PARTIAL, o_ratio
