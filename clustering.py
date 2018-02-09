@@ -9,14 +9,14 @@ class Overlap(Enum):
 
 
 class Clustering:
-    def __init__(self):
+    def __init__(self, ov_min=10, ov_min1=0.1, ov_min2=0.5):
         self._x1cl = []
         self._x2cl = []
         self._ncl = []
         self._clabels = []
-        self._ov_min = 10. # Below this number of overlapping residues, there's no overlap
-        self._ov_min1 = 0.1 # Below this overlap ratio (if it's larger than _ov_min residues), there's no overlap
-        self._ov_min2 = 0.5 # Above this overlap ratio, there's definitely overlap
+        self._ov_min = ov_min # Below this number of overlapping residues, there's no overlap
+        self._ov_min1 = ov_min1 # Below this overlap ratio (if it's larger than _ov_min residues), there's no overlap
+        self._ov_min2 = ov_min2 # Above this overlap ratio, there's definitely overlap
 
     def _clean(self):
         self._x1cl = []
