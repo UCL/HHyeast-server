@@ -86,8 +86,10 @@ try:
             reset_values()
             return
         clabels_l, ncl = dataProcessing.cluster_pred(ref_data['x1'], ref_data['x2'], ov_min, ov_min1, ov_min2)
+        print(ncl, file=sys.stderr)
         clabels = np.array(clabels_l)
         source.data['pcent'] = (clabels+1)*100./float(ncl)
+        source.data['name'] = clabels_l
         cmap.low = 0
     c_controls = [ov_min_text, ov_min1_text, ov_min2_text]
     for cc in c_controls:

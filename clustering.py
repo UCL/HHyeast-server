@@ -68,13 +68,8 @@ class Clustering:
 
     def _overlap(self, x1, x2, x1cl, x2cl):
         dx_min = float(min(x2-x1, x2cl-x1cl))
-        if x2<=x2cl:
-            o_ratio = float(x2-x1cl)/dx_min
-        else:
-            o_ratio = float(x2cl-x1)/dx_min
-        if o_ratio>self._ov_min2:
+        o_ratio = max(abs(float(x1-x1cl)/dx_min), abs(float(x2-x2cl)/dx_min))
+        if o_ratio<max(self._ov_min1,self._ov_min/dx_min):
             return Overlap.FULL, o_ratio
-        elif o_ratio<max(self._ov_min1,self._ov_min/dx_min):
-            return Overlap.ZERO, o_ratio
         else:
-            return Overlap.PARTIAL, o_ratio
+            return Overlap.ZERO, o_ratio
