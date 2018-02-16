@@ -13,8 +13,10 @@ import dataProcessing
 
 import sys
 
-pal = palettes.viridis(10)
-cmap = LinearColorMapper(palette=pal, low=50, high=100)
+pal_seq = palettes.brewer['YlOrRd'][8]
+pal_seq.reverse()
+pal_cat = palettes.brewer['Paired'][5]
+cmap = LinearColorMapper(palette=pal_seq, low=50, high=100)
 
 try:
     # Retrieving the arguments
@@ -81,6 +83,7 @@ try:
         clabels = np.array(clabels_l)
         source.data['pcent'] = (clabels+1)*100./float(ncl)
         source.data['name'] = clabels_l
+        cmap.palette=pal_cat
         cmap.low = 0
     c_controls = [ov_min_text, ov_min1_text]
     for cc in c_controls:
