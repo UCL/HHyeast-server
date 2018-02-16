@@ -67,6 +67,8 @@ try:
         ov_min_text.value = str(om_def)
         ov_min1_text.value = str(om_def1)
         source.data = ref_data
+        cmap.low = 50
+        cmap.palette = pal_seq
     def c_update():
         global ref_data
         try:
@@ -103,6 +105,7 @@ try:
             return
         xmax, nhits, ref_data = dataProcessing.parse_file(filename, prob_cutoff, db)
         cmap.low = prob_cutoff*100
+        cmap.palette = pal_seq
         p.height = 25*max(nhits,ymax)
         p.y_range.start = nhits/2+1
         source.data = ref_data
