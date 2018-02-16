@@ -56,17 +56,14 @@ try:
     ### clustering textInput widgets
     om_def = 10
     om_def1 = 0.1
-    om_def2 = 0.5
-    ov_min_text = TextInput(value=str(om_def), title="Minimum overlap (residues):")
-    ov_min1_text = TextInput(value=str(om_def1), title="Minimum overlap (ratio):")
-    ov_min2_text = TextInput(value=str(om_def2), title="Minimum full overlap (ratio):")
+    ov_min_text = TextInput(value=str(om_def), title="Cluster edges overlap range (residues):")
+    ov_min1_text = TextInput(value=str(om_def1), title="Cluster edges overlap range (ratio):")
     ### Multi-textInput interaction
     def reset_values():
         global ref_data
         threshold_text.value = str(p_def)
         ov_min_text.value = str(om_def)
         ov_min1_text.value = str(om_def1)
-        ov_min2_text.value = str(om_def2)
         source.data = ref_data
     def c_update():
         global ref_data
@@ -80,18 +77,12 @@ try:
         except ValueError:
             reset_values()
             return
-        try:
-            ov_min2 = float(ov_min2_text.value)
-        except ValueError:
-            reset_values()
-            return
-        clabels_l, ncl = dataProcessing.cluster_pred(ref_data['x1'], ref_data['x2'], ov_min, ov_min1, ov_min2)
-        print(ncl, file=sys.stderr)
+        clabels_l, ncl = dataProcessing.cluster_pred(ref_data['x1'], ref_data['x2'], ov_min, ov_min1)
         clabels = np.array(clabels_l)
         source.data['pcent'] = (clabels+1)*100./float(ncl)
         source.data['name'] = clabels_l
         cmap.low = 0
-    c_controls = [ov_min_text, ov_min1_text, ov_min2_text]
+    c_controls = [ov_min_text, ov_min1_text]
     for cc in c_controls:
         cc.on_change("value", lambda attr, old, new: c_update())
 
@@ -114,12 +105,11 @@ try:
         source.data = ref_data
         ov_min_text.value = str(om_def)
         ov_min1_text.value = str(om_def1)
-        ov_min2_text.value = str(om_def2)
     threshold_text.on_change("value", text_handler2)
 
 
     ### Page layout
-    page = gridplot( [widgetbox(ov_min_text, ov_min1_text, ov_min2_text, threshold_text)], [p] )
+    page = gridplot( [widgetbox(ov_min_text, ov_min1_text, threshold_text)], [p] )
     curdoc().add_root(page)
 
 except Exception as e:

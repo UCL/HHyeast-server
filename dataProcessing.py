@@ -189,7 +189,7 @@ def cluster_data_pred(x2d, n_clust):
 
     return c_labels
 
-def cluster_pred(x1l, x2l, ov_min, ov_min1, ov_min2):
+def cluster_pred(x1l, x2l, ov_min=10, ov_min1=0.2, ov_min2=0.5):
     cl = Clustering(ov_min, ov_min1, ov_min2)
     cl.fill_clusters(x1l, x2l)
 

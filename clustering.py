@@ -9,7 +9,7 @@ class Overlap(Enum):
 
 
 class Clustering:
-    def __init__(self, ov_min=10, ov_min1=0.1, ov_min2=0.5):
+    def __init__(self, ov_min=10, ov_min1=0.2, ov_min2=0.5):
         self._x1cl_min = []
         self._x1cl_max = []
         self._x2cl_min = []
