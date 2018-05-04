@@ -84,7 +84,7 @@ try:
         clabels_l, ncl = dataProcessing.cluster_pred(ref_data['x1'], ref_data['x2'], ov_min, ov_min1)
         clabels = np.array(clabels_l)
         source.data['pcent'] = (clabels+1)*100./float(ncl)
-        source.data['name'] = [name+" : cluster: "+str(cluster) for name, cluster in zip(source.data['name'],clabels_l)]
+        source.data['name'] = [name.split('%')[0]+"% : cluster: "+str(cluster) for name, cluster in zip(source.data['name'],clabels_l)]
         cmap.palette=pal_cat
         cmap.low = 0
     c_controls = [ov_min_text, ov_min1_text]
