@@ -115,7 +115,7 @@ try:
 
 
     ### Page layout
-    page = gridplot( [widgetbox(ov_min_text, ov_min1_text, threshold_text)], [p] )
+    page = gridplot( [widgetbox(ov_min_text, ov_min1_text, threshold_text)], [p], sizing_mode='scale_width' )
     curdoc().add_root(page)
 
 except Exception as e:

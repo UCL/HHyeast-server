@@ -84,7 +84,7 @@ try:
 
 
     ### Page layout
-    page = column( plots_l )
+    page = column( plots_l, sizing_mode='scale_width')
 
     curdoc().add_root(page)
 
