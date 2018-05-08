@@ -13,8 +13,10 @@ import dataProcessing
 
 import sys
 
-pal = palettes.viridis(10)
-cmap = LinearColorMapper(palette=pal, low=50, high=100)
+pal_seq = palettes.brewer['YlOrRd'][8]
+pal_seq.reverse()
+pal_cat = palettes.brewer['Paired'][5]
+cmap = LinearColorMapper(palette=pal_seq, low=50, high=100)
 
 try:
     # Retrieving the arguments
@@ -53,40 +55,67 @@ try:
                             text_align='center', text_baseline='middle', text_font_size='1vmin')
     p.add_layout(labels_pname)
 
-    ### Slider widget
-    ncl_slider = Slider(start=0, end=10, value=0, step=1, title="Number of clusters")
-    ### Data-slider interaction
-    def slider_handler(attrname, old, new):
+    ### clustering textInput widgets
+    om_def = 10
+    om_def1 = 0.1
+    ov_min_text = TextInput(value=str(om_def), title="Cluster edges overlap range (residues):")
+    ov_min1_text = TextInput(value=str(om_def1), title="Cluster edges overlap range (ratio):")
+    ### Multi-textInput interaction
+    def reset_values():
         global ref_data
-        ncl = ncl_slider.value
-        if ncl==0:
-            source.data = ref_data
-        else:
-            x2d = np.vstack((ref_data['x1'], ref_data['dx'])).T
-            clabels = dataProcessing.cluster_data_pred(x2d, ncl)
-            source.data['pcent'] = (clabels+1)*100./float(ncl)
-            cmap.low = 0
-    ncl_slider.on_change("value", slider_handler)
+        threshold_text.value = str(p_def)
+        ov_min_text.value = str(om_def)
+        ov_min1_text.value = str(om_def1)
+        source.data = ref_data
+        cmap.low = 50
+        cmap.palette = pal_seq
+    def c_update():
+        global ref_data
+        try:
+            ov_min = float(ov_min_text.value)
+        except ValueError:
+            reset_values()
+            return
+        try:
+            ov_min1 = float(ov_min1_text.value)
+        except ValueError:
+            reset_values()
+            return
+        clabels_l, ncl = dataProcessing.cluster_pred(ref_data['x1'], ref_data['x2'], ov_min, ov_min1)
+        clabels = np.array(clabels_l)
+        source.data['pcent'] = (clabels+1)*100./float(ncl)
+        source.data['name'] = [name.split('%')[0]+"% : cluster: "+str(cluster) for name, cluster in zip(source.data['name'],clabels_l)]
+        cmap.palette=pal_cat
+        cmap.low = 0
+    c_controls = [ov_min_text, ov_min1_text]
+    for cc in c_controls:
+        cc.on_change("value", lambda attr, old, new: c_update())
 
-
-    ### textInput widget
-    threshold_text = TextInput(value="0.5", title="Probability threshold:")
+    ### probability textInput widget
+    p_def = 0.5
+    threshold_text = TextInput(value=str(p_def), title="Probability threshold:")
     ### Data-textInput interaction
     def text_handler2(attrname, old, new):
         global ref_data, p, prob_cutoff
         global filename
-        prob_cutoff = float(threshold_text.value)
+        try:
+            prob_cutoff = float(threshold_text.value)
+        except ValueError:
+            reset_values()
+            return
         xmax, nhits, ref_data = dataProcessing.parse_file(filename, prob_cutoff, db)
         cmap.low = prob_cutoff*100
+        cmap.palette = pal_seq
         p.height = 25*max(nhits,ymax)
         p.y_range.start = nhits/2+1
         source.data = ref_data
-        ncl_slider.value = 0
+        ov_min_text.value = str(om_def)
+        ov_min1_text.value = str(om_def1)
     threshold_text.on_change("value", text_handler2)
 
 
     ### Page layout
-    page = gridplot( [widgetbox(ncl_slider, threshold_text)], [p] )
+    page = gridplot( [widgetbox(ov_min_text, ov_min1_text, threshold_text)], [p] )
     curdoc().add_root(page)
 
 except Exception as e:

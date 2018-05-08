@@ -12,6 +12,7 @@ import numpy as np
 import dataProcessing
 
 import sys
+import os
 
 pal = palettes.viridis(10)
 cmap = LinearColorMapper(palette=pal, low=50, high=100)
@@ -30,9 +31,10 @@ try:
     source_l = []
     dbs = ['pdb', 'pfam', 'yeast']
     xmax, nhitsALL, hitList = dataProcessing.parse_file(filename, prob_cutoff) # Get all hits
+    protein = os.path.basename(filename).split('.')[0].upper()
     # Loop over databases
     for db in dbs:
-        nhits, ref_data = dataProcessing.fill_data_dict(nhitsALL, hitList, db)
+        nhits, ref_data = dataProcessing.fill_data_dict(nhitsALL, hitList, db, protein)
         if nhits!=0:
             dbname_l.append(db.upper())
             nhits_l.append(nhits)
