@@ -66,7 +66,15 @@ class Clustering:
         self._nhits_in_cluster.append(1)
         return self.ncl-1
 
-    # Check if hit with limits [x1,x2] overlaps with index-th cluster.
+    # Check if hit with limits [x1,x2] belongs to the index-th cluster:
+    # The cluster low and high limits are actually ranges,
+    # (x1cl_min, x1cl_max) for low, (x2cl_min, x2cl_max) for high.
+    # The hit belongs to the cluster if BOTH its ends overlap the respective cluster
+    # ends within the required percentage tolerance:
+    # x1 within (x1cl_min-overlap_min, x1cl_max+overlap_min) AND
+    # x2 within (x2cl_min-overlap_min, x2cl_max+overlap_min)
+    # Note that overlap_min is calculated differently for "inside" and "outside"
+    # the cluster (min and max cluster length).
     def _overlap(self, x1, x2, index):
         # Min and max cluster edges limits
         x1cl_min = self._cluster_x1_min[index]
@@ -81,7 +89,7 @@ class Clustering:
         lo_max = x1cl_max+max(self._overlap_min_ratio*dx_min,self._overlap_min)
         hi_min = x2cl_min-max(self._overlap_min_ratio*dx_min,self._overlap_min)
         hi_max = x2cl_max+max(self._overlap_min_ratio*dx_max,self._overlap_min)
-        # Closter edges overlap flags
+        # Cluster edges overlap flags
         ov_lo = x1>lo_min and x1<lo_max
         ov_hi = x2>hi_min and x2<hi_max
         if ov_lo and ov_hi:
