@@ -78,7 +78,7 @@ try:
         p1.y_range.callback = myCallback
         p1.hbar(y="y", height=0.4, left="x1", right="x2", source=source,
                 color={'field': 'pcent', 'transform': cmap})
-        labels_pname1 = LabelSet(x='x1', y='y', text='name', source=source, text_baseline='middle')
+        labels_pname1 = LabelSet(x='x1', y='y', text='name', source=source, text_baseline='middle', text_color='black')
         p1.add_layout(labels_pname1)
         plots_l.append(p1)
 

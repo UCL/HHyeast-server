@@ -52,7 +52,7 @@ try:
     p.hbar(y="y", height=0.4, left="x1", right="x2", source=source,
            color={'field': 'pcent', 'transform': cmap})
     labels_pname = LabelSet(x='xm', y='y', text='name', source=source,
-                            text_align='center', text_baseline='middle', text_font_size='1vmin')
+                            text_align='center', text_baseline='middle', text_color='black')
     p.add_layout(labels_pname)
 
     ### clustering textInput widgets

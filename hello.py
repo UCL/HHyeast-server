@@ -11,13 +11,6 @@ from wtforms import StringField, SubmitField
 import context_processors as cp
 
 from bokeh.embed import server_document
-from bokeh.plotting import figure
-from bokeh.models import LinearColorMapper, ColorBar
-from bokeh.models import palettes
-from bokeh.models import ColumnDataSource, LabelSet, Label
-from bokeh.models import HoverTool, CustomJS
-from bokeh.models.widgets import Slider, Panel, Tabs, TextInput
-from bokeh.layouts import widgetbox, column, layout
 
 import nameProcessing as np
 
