@@ -93,7 +93,7 @@ def syst_name_in_url(e):
 
 # Summary page
 @app.route('/<filename>', methods=['POST','GET'])
-def load_name(filename):
+def load_name(filename, prob=0.5, ov_min=10, ov_min_r=0.1):
     if filename!=filename.upper():
         abort(406, filename)
     if np.is_systematic_name(filename) and not np.is_hypothetical_protein(filename) :
@@ -107,7 +107,8 @@ def load_name(filename):
     filepath = os.path.join(os.path.expanduser('~/data'),np.systematic_name(filename)+'.0.ssw11.hhr')
     if os.path.isfile(filepath):
         bokeh_script = server_document(
-            url='http://localhost:5006/lolliplotServer', arguments=dict(filename=filepath))
+            url='http://localhost:5006/lolliplotServer',
+            arguments=dict(filename=filepath, prob=prob, ov_min=ov_min, ov_min_r=ov_min_r))
 
         return render_template(
                'plot.html',

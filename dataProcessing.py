@@ -1,5 +1,4 @@
 from csb.bio.io import HHpredOutputParser
-from sklearn.cluster import KMeans
 
 import sys
 import os
@@ -148,15 +147,16 @@ def squash_data(data):
     return int(ymax*2.), data
 
 
-# Active clustering: override input data per hit  with data per cluster
-def cluster_data(x2d, data, n_clust):
-    kmeans = KMeans(n_clusters=n_clust, random_state=77)
-    c_labels = kmeans.fit_predict(x2d)
-    c_centers = kmeans.cluster_centers_
+# Active clustering: override input data per hit with data per cluster
+def cluster_data(data, ov_min=10, ov_min1=0.2):
+    cl = Clustering(ov_min, ov_min1)
+    cl.fill_clusters(data['x1'], data['x2'])
 
-    nhits = x2d.shape[0]
-    x1cl = [int(x) for x in c_centers[:,0]]
-    x2cl = [int(x) for x in c_centers[:,1]]
+    c_labels = cl.clabels
+    nhits = len(c_labels)
+    n_clust = cl.ncl
+    x1cl = cl.cluster_x1
+    x2cl = cl.cluster_x2
     ycl = []
     pcentcl = []
     namecl = []
@@ -176,19 +176,14 @@ def cluster_data(x2d, data, n_clust):
                 dxtcl.append(data['dxt'][j])
                 break
 
-    new_data = dict(x1=x1cl, x2=[beg+dif for beg,dif in zip(x1cl,x2cl)], xm=[beg+dif/2 for beg,dif in zip(x1cl,x2cl)],
-                    dx=x2cl, x1t=x1tcl, x2t=x2tcl, dxt=dxtcl,
-                    y=ycl, name=namecl, pcent=pcentcl, detail=detailcl)
+    new_data = dict(x1=x1cl, x2=x2cl, dx=[end-beg for beg,end in zip(x1cl,x2cl)],
+                    xm=[(beg+end)/2 for beg,end in zip(x1cl,x2cl)],
+                    x1t=x1tcl, x2t=x2tcl, dxt=dxtcl,
+                    y=ycl, nhits=cl.nhits, name=namecl, pcent=pcentcl, detail=detailcl)
 
-    return new_data
+    return new_data, n_clust
 
 # Passive clustering: return cluster labels only
-def cluster_data_pred(x2d, n_clust):
-    kmeans = KMeans(n_clusters=n_clust, random_state=77)
-    c_labels = kmeans.fit_predict(x2d)
-
-    return c_labels
-
 def cluster_pred(x1l, x2l, ov_min=10, ov_min1=0.2):
     cl = Clustering(ov_min, ov_min1)
     cl.fill_clusters(x1l, x2l)
