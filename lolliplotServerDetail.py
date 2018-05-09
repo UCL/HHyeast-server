@@ -61,7 +61,7 @@ try:
     om_def1 = 0.1
     ov_min_text = TextInput(value=str(om_def), title="Hit edges overlap tolerance (number of residues):")
     ov_min1_text = TextInput(value=str(om_def1), title="Hit edges overlap tolerance (length ratio):")
-    do_clust_button = Button(label="Do clustering", button_type="primary")
+    preview_clust_button = Button(label="Preview clustering", button_type="primary")
     reset_button = Button(label="Reset", button_type="primary")
     ### Multi-textInput interaction
     def reset_values():
@@ -95,7 +95,7 @@ try:
     c_controls = [ov_min_text, ov_min1_text]
     for cc in c_controls:
         cc.on_change("value", lambda attr, old, new: read_values())
-    do_clust_button.on_click(read_values)
+    preview_clust_button.on_click(read_values)
     reset_button.on_click(reset_values)
 
     ### probability textInput widget
@@ -127,7 +127,7 @@ try:
     empty = Spacer()
     page = gridplot( [widgetbox(threshold_text),
                       widgetbox(cl_title, ov_min_text, ov_min1_text),
-                      widgetbox(empty_vert, do_clust_button, reset_button),
+                      widgetbox(empty_vert, preview_clust_button, reset_button),
                       empty],
                      [p],
                      sizing_mode='scale_width' )
