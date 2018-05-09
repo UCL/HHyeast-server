@@ -41,6 +41,19 @@ class Clustering:
     def clabels(self):
         return self._cluster_labels
 
+    # Lists of cluster limits
+    @property
+    def cluster_x1(self):
+        return self._cluster_x1_min
+    @property
+    def cluster_x2(self):
+        return self._cluster_x2_max
+
+    # List of number of hits in each cluster
+    @property
+    def nhits(self):
+        return self._nhits_in_cluster
+
     # Number of clusters
     @property
     def ncl(self):
