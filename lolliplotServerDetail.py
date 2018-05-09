@@ -5,7 +5,7 @@ from bokeh.models import ColumnDataSource, Range1d, LabelSet, Label
 from bokeh.models import LinearColorMapper, ColorBar
 from bokeh.models import palettes
 from bokeh.layouts import widgetbox, column, layout, gridplot
-from bokeh.models.widgets import Slider, Panel, Tabs, TextInput, PreText
+from bokeh.models.widgets import Slider, Panel, Tabs, TextInput, PreText, Div
 from bokeh.models import HoverTool, CustomJS
 
 import numpy as np
@@ -58,8 +58,8 @@ try:
     ### clustering textInput widgets
     om_def = 10
     om_def1 = 0.1
-    ov_min_text = TextInput(value=str(om_def), title="Cluster edges overlap range (residues):")
-    ov_min1_text = TextInput(value=str(om_def1), title="Cluster edges overlap range (ratio):")
+    ov_min_text = TextInput(value=str(om_def), title="Hit edges overlap tolerance (number of residues):")
+    ov_min1_text = TextInput(value=str(om_def1), title="Hit edges overlap tolerance (length ratio):")
     ### Multi-textInput interaction
     def reset_values():
         global ref_data
@@ -115,7 +115,8 @@ try:
 
 
     ### Page layout
-    page = gridplot( [widgetbox(ov_min_text, ov_min1_text, threshold_text)], [p], sizing_mode='scale_width' )
+    cl_title = Div( text="<h3>Clustering parameters:</h3>" )
+    page = gridplot( [widgetbox(threshold_text), widgetbox(cl_title, ov_min_text, ov_min1_text)], [p], sizing_mode='scale_width' )
     curdoc().add_root(page)
 
 except Exception as e:
