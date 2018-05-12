@@ -121,7 +121,7 @@ def load_name(filename, prob=0.5, ov_min=10, ov_min_r=0.1):
 
 
 # Detail page
-@app.route('/<filename>/<db>')
+@app.route('/<filename>/<db>', methods=['POST','GET'])
 def load_detail(filename, db):
     if filename!=filename.upper() or db!=db.lower():
         abort(406, filename+" "+db)
