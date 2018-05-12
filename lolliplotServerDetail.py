@@ -12,6 +12,7 @@ import numpy as np
 import dataProcessing
 
 import sys
+import os
 
 pal_seq = palettes.brewer['YlOrRd'][8]
 pal_seq.reverse()
@@ -21,7 +22,8 @@ cmap = LinearColorMapper(palette=pal_seq, low=50, high=100)
 try:
     # Retrieving the arguments
     args = curdoc().session_context.request.arguments
-    filename = args.get('filename')[0]
+    filename = args.get('filename')[0].decode("utf-8")
+    orf = os.path.basename(filename).split('.')[0].upper()
     db = args.get('db')[0].decode("utf-8")
 
     ### Read data
@@ -118,10 +120,10 @@ try:
         cmap.palette=pal_cat
         cmap.low = 0
     def f_update():
-        global prob_cutoff, ov_min, ov_min1
+        global orf, prob_cutoff, ov_min, ov_min1
         print('prob in callback = ', prob_cutoff, file=sys.stderr)
         button = curdoc().get_model_by_name('goto_summary_button')
-        button.text = '''<form name="Goto_summary" action="/AFG3" method="get">
+        button.text = '''<form name="Goto_summary" action="/'''+orf+'''" method="get">
         <input type="hidden" name="prob" id="prob" value="'''+str(prob_cutoff)+'''" />
         <input type="hidden" name="ovm" id="ovm" value="'''+str(ov_min)+'''" />
         <input type="hidden" name="ovm1" id="ovm1" value="'''+str(ov_min1)+'''" />
@@ -141,7 +143,7 @@ try:
     ### Page layout
     cl_title = Div( text="<h3>Clustering parameters:</h3>" )
     empty_vert = Div( text="<br><br>" )
-    goto_summary_button = Div(text='''<form name="Goto_summary" action="/AFG3" method="get">
+    goto_summary_button = Div(text='''<form name="Goto_summary" action="/'''+orf+'''" method="get">
     <input type="hidden" name="prob" id="prob" value="'''+str(prob_def)+'''"/>
     <input type="hidden" name="ovm" id="ovm" value="'''+str(om_def)+'''" />
     <input type="hidden" name="ovm1" id="ovm1" value="'''+str(om_def1)+'''" />

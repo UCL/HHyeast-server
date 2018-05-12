@@ -21,7 +21,7 @@ def parse_file(filename, prob_cutoff, db=''):
     if not db:
         return xmax, nhits, hitList
     else:
-        protein = os.path.basename(filename).decode("utf-8").split('.')[0].upper()
+        protein = os.path.basename(filename).split('.')[0].upper()
         nhitsDB, data = fill_data_dict(nhits, hitList, db, protein)
         return xmax, nhitsDB, data
 
