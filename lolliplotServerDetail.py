@@ -5,7 +5,8 @@ from bokeh.models import ColumnDataSource, Range1d, LabelSet, Label
 from bokeh.models import LinearColorMapper, ColorBar
 from bokeh.models import palettes
 from bokeh.layouts import widgetbox, column, layout, gridplot
-from bokeh.models.widgets import Slider, Panel, Tabs, TextInput, PreText
+from bokeh.models.layouts import Spacer
+from bokeh.models.widgets import TextInput, Button, PreText, Div
 from bokeh.models import HoverTool, CustomJS
 
 import numpy as np
@@ -52,14 +53,16 @@ try:
     p.hbar(y="y", height=0.4, left="x1", right="x2", source=source,
            color={'field': 'pcent', 'transform': cmap})
     labels_pname = LabelSet(x='xm', y='y', text='name', source=source,
-                            text_align='center', text_baseline='middle', text_font_size='1vmin')
+                            text_align='center', text_baseline='middle', text_color='black')
     p.add_layout(labels_pname)
 
-    ### clustering textInput widgets
+    ### clustering textInput and button widgets
     om_def = 10
     om_def1 = 0.1
-    ov_min_text = TextInput(value=str(om_def), title="Cluster edges overlap range (residues):")
-    ov_min1_text = TextInput(value=str(om_def1), title="Cluster edges overlap range (ratio):")
+    ov_min_text = TextInput(value=str(om_def), title="Hit edges overlap tolerance (number of residues):")
+    ov_min1_text = TextInput(value=str(om_def1), title="Hit edges overlap tolerance (length ratio):")
+    do_clust_button = Button(label="Do clustering", button_type="primary")
+    reset_button = Button(label="Reset", button_type="primary")
     ### Multi-textInput interaction
     def reset_values():
         global ref_data
@@ -69,8 +72,7 @@ try:
         source.data = ref_data
         cmap.low = 50
         cmap.palette = pal_seq
-    def c_update():
-        global ref_data
+    def read_values():
         try:
             ov_min = float(ov_min_text.value)
         except ValueError:
@@ -81,6 +83,9 @@ try:
         except ValueError:
             reset_values()
             return
+        c_update(ov_min, ov_min1)
+    def c_update(ov_min, ov_min1):
+        global ref_data
         clabels_l, ncl = dataProcessing.cluster_pred(ref_data['x1'], ref_data['x2'], ov_min, ov_min1)
         clabels = np.array(clabels_l)
         source.data['pcent'] = (clabels+1)*100./float(ncl)
@@ -89,7 +94,9 @@ try:
         cmap.low = 0
     c_controls = [ov_min_text, ov_min1_text]
     for cc in c_controls:
-        cc.on_change("value", lambda attr, old, new: c_update())
+        cc.on_change("value", lambda attr, old, new: read_values())
+    do_clust_button.on_click(read_values)
+    reset_button.on_click(reset_values)
 
     ### probability textInput widget
     p_def = 0.5
@@ -115,7 +122,15 @@ try:
 
 
     ### Page layout
-    page = gridplot( [widgetbox(ov_min_text, ov_min1_text, threshold_text)], [p] )
+    cl_title = Div( text="<h3>Clustering parameters:</h3>" )
+    empty_vert = Div( text="<br><br>" )
+    empty = Spacer()
+    page = gridplot( [widgetbox(threshold_text),
+                      widgetbox(cl_title, ov_min_text, ov_min1_text),
+                      widgetbox(empty_vert, do_clust_button, reset_button),
+                      empty],
+                     [p],
+                     sizing_mode='scale_width' )
     curdoc().add_root(page)
 
 except Exception as e:
