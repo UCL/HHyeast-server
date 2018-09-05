@@ -93,7 +93,7 @@ def syst_name_in_url(e):
 
 # Summary page
 @app.route('/<filename>', methods=['POST','GET'])
-def load_name(filename, prob=0.5, ov_min=10, ov_min_r=0.1):
+def load_name(filename):
     if filename!=filename.upper():
         abort(406, filename)
     if np.is_systematic_name(filename) and not np.is_hypothetical_protein(filename) :
@@ -105,6 +105,9 @@ def load_name(filename, prob=0.5, ov_min=10, ov_min_r=0.1):
             msg=filename+" is not a valid ORF. Please choose a different one.")
 
     filepath = os.path.join(os.path.expanduser('~/data'),np.systematic_name(filename)+'.0.ssw11.hhr')
+    prob = request.args.get('prob', default=0.5, type=float)
+    ov_min = request.args.get('ovm', default=10, type=int)
+    ov_min_r = request.args.get('ovm1', default=0.1, type=float)
     if os.path.isfile(filepath):
         bokeh_script = server_document(
             url='http://localhost:5006/lolliplotServer',

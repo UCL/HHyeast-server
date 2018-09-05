@@ -25,7 +25,6 @@ try:
     prob_cutoff = float(args.get('prob')[0].decode("utf-8"))
     ov_min = int(args.get('ov_min')[0].decode("utf-8"))
     ov_min_r = float(args.get('ov_min_r')[0].decode("utf-8"))
-    print(prob_cutoff, ov_min, ov_min_r, file=sys.stderr)
 
     ### Read data
     xmax = 0
@@ -64,7 +63,6 @@ try:
         ### Cluster data
         new_data, ncl = dataProcessing.cluster_data(ref_data, ov_min, ov_min_r)
         source.data = new_data
-        print(ncl, file=sys.stderr)
 
         ### Main figure
         p1 = figure(tools=[hover,'save','xpan','wheel_zoom','reset'], title=title,

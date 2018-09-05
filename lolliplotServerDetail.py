@@ -10,6 +10,7 @@ from bokeh.models import HoverTool, CustomJS
 
 import numpy as np
 import dataProcessing
+import nameProcessing as namep
 
 import sys
 import os
@@ -24,6 +25,7 @@ try:
     args = curdoc().session_context.request.arguments
     filename = args.get('filename')[0].decode("utf-8")
     orf = os.path.basename(filename).split('.')[0].upper()
+    orf = namep.standard_name(orf)
     db = args.get('db')[0].decode("utf-8")
 
     ### Read data
@@ -102,7 +104,7 @@ try:
     def read_values():
         global ov_min, ov_min1
         try:
-            ov_min = float(ov_min_text.value)
+            ov_min = int(ov_min_text.value)
         except ValueError:
             reset_values()
             return
@@ -121,13 +123,12 @@ try:
         cmap.low = 0
     def f_update():
         global orf, prob_cutoff, ov_min, ov_min1
-        print('prob in callback = ', prob_cutoff, file=sys.stderr)
         button = curdoc().get_model_by_name('goto_summary_button')
         button.text = '''<form name="Goto_summary" action="/'''+orf+'''" method="get">
         <input type="hidden" name="prob" id="prob" value="'''+str(prob_cutoff)+'''" />
         <input type="hidden" name="ovm" id="ovm" value="'''+str(ov_min)+'''" />
         <input type="hidden" name="ovm1" id="ovm1" value="'''+str(ov_min1)+'''" />
-        <input type="submit"/>
+        <button type="submit">Go to summary view</button>
         </form>'''
     def preview():
         read_values()
@@ -147,7 +148,7 @@ try:
     <input type="hidden" name="prob" id="prob" value="'''+str(prob_def)+'''"/>
     <input type="hidden" name="ovm" id="ovm" value="'''+str(om_def)+'''" />
     <input type="hidden" name="ovm1" id="ovm1" value="'''+str(om_def1)+'''" />
-    <input type="submit"/>
+    <button type="submit">Go to summary view</button>
     </form>''', name='goto_summary_button')
     page = layout( [widgetbox(threshold_text),
                     widgetbox(cl_title, ov_min_text, ov_min1_text),
