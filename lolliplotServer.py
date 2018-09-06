@@ -36,7 +36,7 @@ try:
     protein = os.path.basename(filename).split('.')[0].upper()
     # Loop over databases
     for db in dbs:
-        nhits, ref_data = dataProcessing.fill_data_dict(nhitsALL, hitList, db, protein)
+        nhits, ref_data = dataProcessing.fill_data_dict(nhitsALL, hitList, db, protein, False)
         if nhits!=0:
             dbname_l.append(db.upper())
             ref_data_l.append(dict(ref_data))

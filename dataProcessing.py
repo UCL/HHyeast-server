@@ -23,16 +23,22 @@ def parse_file(filename, prob_cutoff, db=''):
     else:
         protein = os.path.basename(filename).split('.')[0].upper()
         nhitsDB, data = fill_data_dict(nhits, hitList, db, protein)
+        print(nhitsDB, file=sys.stderr)
         return xmax, nhitsDB, data
 
 
 # Fill data dictionary from hitList structure and do some post-processing
-def fill_data_dict(nhits, hitList, db, protein):
+def fill_data_dict(nhits, hitList, db, protein, squash=True):
     if db in ['pdb', 'pfam', 'yeast']:
+        print(nhits, file=sys.stderr)
         data, hasLongHits = fill_data(nhits, hitList, db, protein)
         if hasLongHits:
             data = filter_short_hits(data)
-        ymax, data = squash_data(data)
+            print(len(data['y']), file=sys.stderr)
+        ymax = int(data['y'][-1]*2.)
+        if squash:
+            ymax, data = squash_data(data)
+        print(ymax, file=sys.stderr)
         
         return ymax, data
     else:
