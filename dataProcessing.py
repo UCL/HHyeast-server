@@ -32,9 +32,11 @@ def fill_data_dict(nhits, hitList, db, protein, squash=True):
     if db in ['pdb', 'pfam', 'yeast']:
         print(nhits, file=sys.stderr)
         data, hasLongHits = fill_data(nhits, hitList, db, protein)
+        # Trim short hits
         if hasLongHits:
             data = filter_short_hits(data)
             print(len(data['y']), file=sys.stderr)
+        # Squash data in y axis for pretty display
         ymax = int(data['y'][-1]*2.)
         if squash:
             ymax, data = squash_data(data)
@@ -137,18 +139,23 @@ def squash_data(data):
 
     ymax = data['y'][0]
     gap = 5
-    for i in range(nhits): # loop over hits
-        for j in range(nhits): # loop over y positions
+    ydict = [ [0] ] # list of lists. index = y index; value: list of hit indices in this y position. Initialised with first hit.
+    for i in range(1, nhits): # loop over hits
+        squashed = False
+        for j in range(len(ydict)): # loop over y positions
             y = float(j+1)/2.
             isGap = True
-            for k in range(nhits): # loop over hits in this y position
-                if k!=i and data['y'][k]==y:
-                    if data['x2'][k]>data['x1'][i]-gap and data['x1'][k]<data['x2'][i]+gap:
-                        isGap = False
-                        break
+            for k in ydict[j]: # loop over hits in this y position
+                if data['x2'][k]>data['x1'][i]-gap and data['x1'][k]<data['x2'][i]+gap:
+                    isGap = False
+                    break
             if isGap:
                 data['y'][i] = y
+                ydict[j].append(i)
+                squashed = True
                 break
+        if not squashed:
+            ydict.append([i])
         ymax = max(ymax,data['y'][i])
     return int(ymax*2.), data
 
