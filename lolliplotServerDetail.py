@@ -80,6 +80,7 @@ try:
         source.data = ref_data
         ov_min_text.value = str(om_def)
         ov_min1_text.value = str(om_def1)
+        f_update()
     threshold_text.on_change("value", text_handler2)
 
 
@@ -130,6 +131,9 @@ try:
         <input type="hidden" name="ovm1" id="ovm1" value="'''+str(ov_min1)+'''" />
         <button type="submit">Go to summary view</button>
         </form>'''
+    def change_values():
+        read_values()
+        f_update()
     def preview():
         read_values()
         c_update()
@@ -137,7 +141,7 @@ try:
 
     c_controls = [ov_min_text, ov_min1_text]
     for cc in c_controls:
-        cc.on_change("value", lambda attr, old, new: read_values())
+        cc.on_change("value", lambda attr, old, new: change_values())
     preview_clust_button.on_click(preview)
     reset_button.on_click(reset_values)
 
