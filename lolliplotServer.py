@@ -14,19 +14,21 @@ import dataProcessing
 import sys
 import os
 
-pal = palettes.viridis(10)
+pal = palettes.brewer['YlOrRd'][8]
+pal.reverse()
 cmap = LinearColorMapper(palette=pal, low=50, high=100)
 
 try:
     # Retrieving the arguments
     args = curdoc().session_context.request.arguments
     filename = args.get('filename')[0].decode("utf-8")
+    prob_cutoff = float(args.get('prob')[0].decode("utf-8"))
+    ov_min = int(args.get('ov_min')[0].decode("utf-8"))
+    ov_min_r = float(args.get('ov_min_r')[0].decode("utf-8"))
 
     ### Read data
-    prob_cutoff = 0.5
     xmax = 0
     dbname_l = []
-    nhits_l = []
     ref_data_l = []
     source_l = []
     dbs = ['pdb', 'pfam', 'yeast']
@@ -37,7 +39,6 @@ try:
         nhits, ref_data = dataProcessing.fill_data_dict(nhitsALL, hitList, db, protein)
         if nhits!=0:
             dbname_l.append(db.upper())
-            nhits_l.append(nhits)
             ref_data_l.append(dict(ref_data))
             source_l.append(ColumnDataSource( data=ref_data.copy() )) # source holds a COPY of the ref_data dict
 
@@ -49,6 +50,7 @@ try:
     # Tooltip
     hover = HoverTool(
         tooltips = [ ("Cluster limits", "@x1-@x2"),
+                     ("Number of hits in cluster", "@nhits"),
                      ("Highest probability hit", "@detail"),
                      ("Template HMM", "@x1t-@x2t (@dxt)") ]
     )
@@ -56,23 +58,16 @@ try:
     page = column()
     ncl_ref = 10
     plots_l = []
-    for dbname, nhits, ref_data, source in zip(dbname_l, nhits_l, ref_data_l, source_l):
-        #print(nhits1, file=sys.stderr)
-        title = 'Matches to database '+dbname
-        ncl = ncl_ref
-        if nhits>=ncl:
-            x2d = np.vstack((ref_data['x1'], ref_data['dx'])).T
-            ncl = min(len(np.unique(x2d,axis=0)), ncl)
-            title = title+', clustered in '+str(ncl)
-            ### Cluster data
-            new_data = dataProcessing.cluster_data(x2d, ref_data, ncl)
-            source.data = new_data
-        else:
-            title = title+', not clustered'
+    for dbname, ref_data, source in zip(dbname_l, ref_data_l, source_l):
+        title = 'Clustered matches to database '+dbname
+        ### Cluster data
+        new_data, ncl = dataProcessing.cluster_data(ref_data, ov_min, ov_min_r)
+        source.data = new_data
 
         ### Main figure
-        p1 = figure(tools=[hover,'save','xpan','wheel_zoom','reset'], title=title, width=1500, height=25*ncl_ref,
-                    x_range=(0,xmax), y_range=(min(ncl_ref,nhits)/2+1,0), x_axis_location="above")
+        p1 = figure(tools=[hover,'save','xpan','wheel_zoom','reset'], title=title,
+                    width=1500, height=25*max(ncl_ref,ncl),
+                    x_range=(0,xmax), y_range=(max(ncl_ref,ncl)/2+1,0), x_axis_location="above")
         p1.ygrid.visible=False
         p1.yaxis.visible=False
         p1.y_range.callback = myCallback

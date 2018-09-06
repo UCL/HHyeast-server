@@ -105,9 +105,13 @@ def load_name(filename):
             msg=filename+" is not a valid ORF. Please choose a different one.")
 
     filepath = os.path.join(os.path.expanduser('~/data'),np.systematic_name(filename)+'.0.ssw11.hhr')
+    prob = request.args.get('prob', default=0.5, type=float)
+    ov_min = request.args.get('ovm', default=10, type=int)
+    ov_min_r = request.args.get('ovm1', default=0.1, type=float)
     if os.path.isfile(filepath):
         bokeh_script = server_document(
-            url='http://localhost:5006/lolliplotServer', arguments=dict(filename=filepath))
+            url='http://localhost:5006/lolliplotServer',
+            arguments=dict(filename=filepath, prob=prob, ov_min=ov_min, ov_min_r=ov_min_r))
 
         return render_template(
                'plot.html',
@@ -120,7 +124,7 @@ def load_name(filename):
 
 
 # Detail page
-@app.route('/<filename>/<db>')
+@app.route('/<filename>/<db>', methods=['POST','GET'])
 def load_detail(filename, db):
     if filename!=filename.upper() or db!=db.lower():
         abort(406, filename+" "+db)
