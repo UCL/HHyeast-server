@@ -155,6 +155,7 @@ def squash_data(data):
                 squashed = True
                 break
         if not squashed:
+            data['y'][i] = float(len(ydict)+1)/2.
             ydict.append([i])
         ymax = max(ymax,data['y'][i])
     return int(ymax*2.), data
