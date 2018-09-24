@@ -23,24 +23,23 @@ def parse_file(filename, prob_cutoff, db=''):
     else:
         protein = os.path.basename(filename).split('.')[0].upper()
         nhitsDB, data = fill_data_dict(nhits, hitList, db, protein)
-        print(nhitsDB, file=sys.stderr)
         return xmax, nhitsDB, data
 
 
 # Fill data dictionary from hitList structure and do some post-processing
 def fill_data_dict(nhits, hitList, db, protein, squash=True):
     if db in ['pdb', 'pfam', 'yeast']:
-        print(nhits, file=sys.stderr)
         data, hasLongHits = fill_data(nhits, hitList, db, protein)
         # Trim short hits
         if hasLongHits:
             data = filter_short_hits(data)
-            print(len(data['y']), file=sys.stderr)
+        # Trim overly repeated hits
+        if len(data['y'])>1000:
+            data = filter_repeated_hits(data)
         # Squash data in y axis for pretty display
         ymax = int(data['y'][-1]*2.)
         if squash:
             ymax, data = squash_data(data)
-        print(ymax, file=sys.stderr)
         
         return ymax, data
     else:
@@ -117,17 +116,36 @@ def fill_data(nhits, hitList, db, protein):
 
     data = dict(x1=x1, x2=x2, xm=[beg+dif/2 for beg,dif in zip(x1,dx)], dx=dx, x1t=x1t, x2t=x2t, dxt=dxt,
                 y=y, name=name, pcent=pcent, detail=detail)
-
+    
     return data, hasLongHits
 
 
 # Filter out short hits from data dictionary
 def filter_short_hits(data):
     nhits = len(data['x1'])
-    for i in range(nhits):
-        if data['dx'][i]<min_hit_length2:
-            for key in data.keys():
-                data[key].pop(i)
+    for key in data.keys():
+        data[key][:] = [value for value,dx in zip(data[key],data['dx']) if dx>=min_hit_length2]
+
+    return data
+
+
+# Filter out overly repeated hits from data dictionary
+def filter_repeated_hits(data):
+    cl = Clustering(10, 0.1) # cluster with default values
+    cl.fill_clusters(data['x1'], data['x2'])
+
+    toDelete = [False]*len(cl.clabels)
+    for icl in range(cl.ncl): # loop over clusters
+        if cl.nhits[icl]>50:
+            counter = 0
+            for i in range(len(cl.clabels)): # loop over hits
+                if cl.clabels[i]==icl:
+                    counter = counter + 1
+                    if counter>50:
+                        toDelete[i] = True
+
+    for key in data.keys():
+        data[key][:] = [value for value,flag in zip(data[key],toDelete) if not flag]
     return data
 
 
