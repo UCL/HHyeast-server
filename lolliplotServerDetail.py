@@ -31,7 +31,7 @@ try:
     ### Read data
     prob_def = 0.5
     prob_cutoff = prob_def
-    xmax, nhits, ref_data = dataProcessing.parse_file(filename, prob_cutoff, db)
+    xmax, nhits, ref_data, trimmed = dataProcessing.parse_file(filename, prob_cutoff, db)
     source = ColumnDataSource( data=dict(ref_data) ) # source holds a COPY of the ref_data dict
 
 
@@ -72,7 +72,7 @@ try:
         except ValueError:
             reset_values()
             return
-        xmax, nhits, ref_data = dataProcessing.parse_file(filename, prob_cutoff, db)
+        xmax, nhits, ref_data, trimmed = dataProcessing.parse_file(filename, prob_cutoff, db)
         cmap.low = prob_cutoff*100
         cmap.palette = pal_seq
         p.height = 25*max(nhits,ymax)
@@ -80,6 +80,9 @@ try:
         source.data = ref_data
         ov_min_text.value = str(om_def)
         ov_min1_text.value = str(om_def1)
+        top_title.text = "<h3></h3>"
+        if trimmed:
+            top_title.text = "<h3>Caution: some regions had >50 hits, and have been truncated.</h3>"
         f_update()
     threshold_text.on_change("value", text_handler2)
 
@@ -124,8 +127,7 @@ try:
         cmap.low = 0
     def f_update():
         global orf, prob_cutoff, ov_min, ov_min1
-        button = curdoc().get_model_by_name('goto_summary_button')
-        button.text = '''<form name="Goto_summary" action="/'''+orf+'''" method="get">
+        goto_summary_button.text = '''<form name="Goto_summary" action="/'''+orf+'''" method="get">
         <input type="hidden" name="prob" id="prob" value="'''+str(prob_cutoff)+'''" />
         <input type="hidden" name="ovm" id="ovm" value="'''+str(ov_min)+'''" />
         <input type="hidden" name="ovm1" id="ovm1" value="'''+str(ov_min1)+'''" />
@@ -146,6 +148,9 @@ try:
     reset_button.on_click(reset_values)
 
     ### Page layout
+    top_title = Div( text="<h3></h3>", name='top_title')
+    if trimmed:
+        top_title.text = "<h3>Caution: some regions had >50 hits, and have been truncated.</h3>"
     cl_title = Div( text="<h3>Clustering parameters:</h3>" )
     empty_vert = Div( text="<br><br>" )
     goto_summary_button = Div(text='''<form name="Goto_summary" action="/'''+orf+'''" method="get">
@@ -154,7 +159,8 @@ try:
     <input type="hidden" name="ovm1" id="ovm1" value="'''+str(om_def1)+'''" />
     <button type="submit">Go to summary view</button>
     </form>''', name='goto_summary_button')
-    page = layout( [widgetbox(threshold_text),
+    page = layout( [widgetbox(top_title)],
+                   [widgetbox(threshold_text),
                     widgetbox(cl_title, ov_min_text, ov_min1_text),
                     widgetbox(empty_vert, preview_clust_button, reset_button),
                     widgetbox(goto_summary_button)],

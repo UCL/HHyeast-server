@@ -22,8 +22,8 @@ def parse_file(filename, prob_cutoff, db=''):
         return xmax, nhits, hitList
     else:
         protein = os.path.basename(filename).split('.')[0].upper()
-        nhitsDB, data = fill_data_dict(nhits, hitList, db, protein)
-        return xmax, nhitsDB, data
+        nhitsDB, data, trimmed = fill_data_dict(nhits, hitList, db, protein)
+        return xmax, nhitsDB, data, trimmed
 
 
 # Fill data dictionary from hitList structure and do some post-processing
@@ -34,14 +34,16 @@ def fill_data_dict(nhits, hitList, db, protein, squash=True):
         if hasLongHits:
             data = filter_short_hits(data)
         # Trim overly repeated hits
+        trimmed = False
         if len(data['y'])>1000:
+            trimmed = True
             data = filter_repeated_hits(data)
         # Squash data in y axis for pretty display
         ymax = int(data['y'][-1]*2.)
         if squash:
             ymax, data = squash_data(data)
         
-        return ymax, data
+        return ymax, data, trimmed
     else:
         raise ValueError("Data for database "+db+" does not exist. Please choose between pdb, pfam or yeast.")
 
