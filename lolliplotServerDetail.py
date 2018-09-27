@@ -25,7 +25,8 @@ try:
     args = curdoc().session_context.request.arguments
     filename = args.get('filename')[0].decode("utf-8")
     orf = os.path.basename(filename).split('.')[0].upper()
-    orf = namep.standard_name(orf)
+    if not namep.is_hypothetical_protein(orf):
+        orf = namep.standard_name(orf)
     db = args.get('db')[0].decode("utf-8")
 
     ### Read data
