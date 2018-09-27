@@ -29,7 +29,10 @@ def parse_file(filename, prob_cutoff, db=''):
 # Fill data dictionary from hitList structure and do some post-processing
 def fill_data_dict(nhits, hitList, db, protein, squash=True):
     if db in ['pdb', 'pfam', 'yeast']:
+        data = {}
         data, hasLongHits = fill_data(nhits, hitList, db, protein)
+        if not data:
+            return 0, data, False
         # Trim short hits
         if hasLongHits:
             data = filter_short_hits(data)
@@ -97,7 +100,7 @@ def fill_data(nhits, hitList, db, protein):
         elif db!='pdb':
             continue
         # Get rid of hits with the same name as current protein
-        if nameProcessing.systematic_name(hit.id)==protein or (hasattr(hit,'name') and hit.name.find(nameProcessing.standard_name(protein))>=0):
+        if nameProcessing.systematic_name(hit.id)==protein or ((hasattr(hit,'name') and nameProcessing.standard_name(protein) and hit.name.find(nameProcessing.standard_name(protein))>=0)):
             continue
         # Fill data lists
         x1.append(hit.qstart)
@@ -116,8 +119,10 @@ def fill_data(nhits, hitList, db, protein):
         if hit.probability<prob_cutoff and hit.qend-hit.qstart>=min_hit_length2:
             hasLongHits = True
 
-    data = dict(x1=x1, x2=x2, xm=[beg+dif/2 for beg,dif in zip(x1,dx)], dx=dx, x1t=x1t, x2t=x2t, dxt=dxt,
-                y=y, name=name, pcent=pcent, detail=detail)
+    data = {}
+    if len(x1)>0:
+        data = dict(x1=x1, x2=x2, xm=[beg+dif/2 for beg,dif in zip(x1,dx)], dx=dx, x1t=x1t, x2t=x2t, dxt=dxt,
+                    y=y, name=name, pcent=pcent, detail=detail)
     
     return data, hasLongHits
 

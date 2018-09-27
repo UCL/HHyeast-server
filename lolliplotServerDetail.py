@@ -33,7 +33,8 @@ try:
     prob_cutoff = prob_def
     xmax, nhits, ref_data, trimmed = dataProcessing.parse_file(filename, prob_cutoff, db)
     source = ColumnDataSource( data=dict(ref_data) ) # source holds a COPY of the ref_data dict
-
+    if not ref_data:
+        raise Exception("No hits passing quality criteria found above the probability threshold.")
 
     ### Tooltip
     hover = HoverTool(

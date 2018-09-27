@@ -43,6 +43,8 @@ try:
             ref_data_l.append(dict(ref_data))
             source_l.append(ColumnDataSource( data=ref_data.copy() )) # source holds a COPY of the ref_data dict
             trimmed_l.append(trimmed)
+    if not dbname_l:
+        raise Exception("No hits passing quality criteria found above the probability threshold.")
 
     ### Stuff common to all plots:
     ### Need this callback mechanism in order to update the plots when reading new probThr
