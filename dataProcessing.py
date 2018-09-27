@@ -22,19 +22,31 @@ def parse_file(filename, prob_cutoff, db=''):
         return xmax, nhits, hitList
     else:
         protein = os.path.basename(filename).split('.')[0].upper()
-        nhitsDB, data = fill_data_dict(nhits, hitList, db, protein)
-        return xmax, nhitsDB, data
+        nhitsDB, data, trimmed = fill_data_dict(nhits, hitList, db, protein)
+        return xmax, nhitsDB, data, trimmed
 
 
 # Fill data dictionary from hitList structure and do some post-processing
-def fill_data_dict(nhits, hitList, db, protein):
+def fill_data_dict(nhits, hitList, db, protein, squash=True):
     if db in ['pdb', 'pfam', 'yeast']:
+        data = {}
         data, hasLongHits = fill_data(nhits, hitList, db, protein)
+        if not data:
+            return 0, data, False
+        # Trim short hits
         if hasLongHits:
             data = filter_short_hits(data)
-        ymax, data = squash_data(data)
+        # Trim overly repeated hits
+        trimmed = False
+        if len(data['y'])>1000:
+            trimmed = True
+            data = filter_repeated_hits(data)
+        # Squash data in y axis for pretty display
+        ymax = int(data['y'][-1]*2.)
+        if squash:
+            ymax, data = squash_data(data)
         
-        return ymax, data
+        return ymax, data, trimmed
     else:
         raise ValueError("Data for database "+db+" does not exist. Please choose between pdb, pfam or yeast.")
 
@@ -88,7 +100,7 @@ def fill_data(nhits, hitList, db, protein):
         elif db!='pdb':
             continue
         # Get rid of hits with the same name as current protein
-        if nameProcessing.systematic_name(hit.id)==protein or (hasattr(hit,'name') and hit.name.find(nameProcessing.standard_name(protein))>=0):
+        if nameProcessing.systematic_name(hit.id)==protein or ((hasattr(hit,'name') and nameProcessing.standard_name(protein) and hit.name.find(nameProcessing.standard_name(protein))>=0)):
             continue
         # Fill data lists
         x1.append(hit.qstart)
@@ -107,19 +119,40 @@ def fill_data(nhits, hitList, db, protein):
         if hit.probability<prob_cutoff and hit.qend-hit.qstart>=min_hit_length2:
             hasLongHits = True
 
-    data = dict(x1=x1, x2=x2, xm=[beg+dif/2 for beg,dif in zip(x1,dx)], dx=dx, x1t=x1t, x2t=x2t, dxt=dxt,
-                y=y, name=name, pcent=pcent, detail=detail)
-
+    data = {}
+    if len(x1)>0:
+        data = dict(x1=x1, x2=x2, xm=[beg+dif/2 for beg,dif in zip(x1,dx)], dx=dx, x1t=x1t, x2t=x2t, dxt=dxt,
+                    y=y, name=name, pcent=pcent, detail=detail)
+    
     return data, hasLongHits
 
 
 # Filter out short hits from data dictionary
 def filter_short_hits(data):
     nhits = len(data['x1'])
-    for i in range(nhits):
-        if data['dx'][i]<min_hit_length2:
-            for key in data.keys():
-                data[key].pop(i)
+    for key in data.keys():
+        data[key][:] = [value for value,dx in zip(data[key],data['dx']) if dx>=min_hit_length2]
+
+    return data
+
+
+# Filter out overly repeated hits from data dictionary
+def filter_repeated_hits(data):
+    cl = Clustering(10, 0.1) # cluster with default values
+    cl.fill_clusters(data['x1'], data['x2'])
+
+    toDelete = [False]*len(cl.clabels)
+    for icl in range(cl.ncl): # loop over clusters
+        if cl.nhits[icl]>50:
+            counter = 0
+            for i in range(len(cl.clabels)): # loop over hits
+                if cl.clabels[i]==icl:
+                    counter = counter + 1
+                    if counter>50:
+                        toDelete[i] = True
+
+    for key in data.keys():
+        data[key][:] = [value for value,flag in zip(data[key],toDelete) if not flag]
     return data
 
 
@@ -131,18 +164,24 @@ def squash_data(data):
 
     ymax = data['y'][0]
     gap = 5
-    for i in range(nhits): # loop over hits
-        for j in range(nhits): # loop over y positions
+    ydict = [ [0] ] # list of lists. index = y index; value: list of hit indices in this y position. Initialised with first hit.
+    for i in range(1, nhits): # loop over hits
+        squashed = False
+        for j in range(len(ydict)): # loop over y positions
             y = float(j+1)/2.
             isGap = True
-            for k in range(nhits): # loop over hits in this y position
-                if k!=i and data['y'][k]==y:
-                    if data['x2'][k]>data['x1'][i]-gap and data['x1'][k]<data['x2'][i]+gap:
-                        isGap = False
-                        break
+            for k in ydict[j]: # loop over hits in this y position
+                if data['x2'][k]>data['x1'][i]-gap and data['x1'][k]<data['x2'][i]+gap:
+                    isGap = False
+                    break
             if isGap:
                 data['y'][i] = y
+                ydict[j].append(i)
+                squashed = True
                 break
+        if not squashed:
+            data['y'][i] = float(len(ydict)+1)/2.
+            ydict.append([i])
         ymax = max(ymax,data['y'][i])
     return int(ymax*2.), data
 

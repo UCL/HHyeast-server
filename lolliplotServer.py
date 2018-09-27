@@ -31,16 +31,20 @@ try:
     dbname_l = []
     ref_data_l = []
     source_l = []
+    trimmed_l = []
     dbs = ['pdb', 'pfam', 'yeast']
     xmax, nhitsALL, hitList = dataProcessing.parse_file(filename, prob_cutoff) # Get all hits
     protein = os.path.basename(filename).split('.')[0].upper()
     # Loop over databases
     for db in dbs:
-        nhits, ref_data = dataProcessing.fill_data_dict(nhitsALL, hitList, db, protein)
+        nhits, ref_data, trimmed = dataProcessing.fill_data_dict(nhitsALL, hitList, db, protein, False)
         if nhits!=0:
             dbname_l.append(db.upper())
             ref_data_l.append(dict(ref_data))
             source_l.append(ColumnDataSource( data=ref_data.copy() )) # source holds a COPY of the ref_data dict
+            trimmed_l.append(trimmed)
+    if not dbname_l:
+        raise Exception("No hits passing quality criteria found above the probability threshold.")
 
     ### Stuff common to all plots:
     ### Need this callback mechanism in order to update the plots when reading new probThr
@@ -58,8 +62,10 @@ try:
     page = column()
     ncl_ref = 10
     plots_l = []
-    for dbname, ref_data, source in zip(dbname_l, ref_data_l, source_l):
+    for dbname, ref_data, source, trimmed in zip(dbname_l, ref_data_l, source_l, trimmed_l):
         title = 'Clustered matches to database '+dbname
+        if trimmed:
+            title = title+'. Caution: some clusters had >50 hits, and have been truncated.'
         ### Cluster data
         new_data, ncl = dataProcessing.cluster_data(ref_data, ov_min, ov_min_r)
         source.data = new_data
