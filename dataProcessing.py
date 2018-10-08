@@ -131,7 +131,10 @@ def fill_data(nhits, hitList, db, protein):
 def filter_short_hits(data):
     nhits = len(data['x1'])
     for key in data.keys():
+        if key=='dx':
+            continue
         data[key][:] = [value for value,dx in zip(data[key],data['dx']) if dx>=min_hit_length2]
+    data['dx'][:] = [dx for dx in data['dx'] if dx>=min_hit_length2]
 
     return data
 
