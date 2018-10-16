@@ -1,0 +1,10 @@
+[Unit]
+Description=Start flask app for hhyeast server
+
+[Service]
+ExecStart=/home/ilektra/HHyeast-server/start-server.sh
+Type=simple
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
