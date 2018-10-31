@@ -5,7 +5,52 @@
 {% endblock breadcrumb_links %}
 
   {% block content %}
-  <p>Delivering accurate structural bioinformatics to the yeast community with the HHprY data </p>
+  <h1>Delivering accurate structural bioinformatics to the yeast community with the HHprY data </h1>
+
+  <h3>Welcome to the HHyeast website. </h3>
+
+  <p>This website offers the results of remote homology searches of the entire genome of the model
+      budding yeast Saccharomyces cerevisiae. The searches have been carried out using the HHsearch
+      package developed by Johanne Soeding and colleagues [1], a tool also known as "HHpred" through
+      its online server [2]. </p>
+
+  <p>The results show visualisations of the strongest homologies for 100% of 6,713 verified yeast open
+      reading frames (ORFs) in three databases:
+
+PDB (solved structures)
+Pfam (curated protein domain families from the European Bioinformatics Institute)
+      the yeast proteome itself. </p>
+
+  <p>For each ORF, the summary of all three that allows you to investigate each set of hits in more detail,
+      re-setting the thresholds etc that allow more or less hits to be displayed. </p>
+
+  <h3>Data Download </h3>
+
+  <p>As well as being able to save images of the domain displays through the controls in each window,
+      for each ORF the file from which the data has been extracted for the visualisation can be downloaded
+      (suffix ".hhr", opened as a text file). </p>
+
+  <h3>Gaps between the domains in the visualisations </h3>
+
+  <p>HHyeast has discovered YYY additional hits in the gaps between the domains displayed here [3].
+      Although these are not in the visualisations, it is clear which ORFs have such hits from the download
+      buttons, which ... insert text here </p>
+
+  <h3>Job submission </h3>
+
+  <p>Type a gene identifier, either systematic name or standard name if available. The server will offer
+      valid options. Typically three panels will be displayed, one for each of the databases (PDB, Pfam Yeast),
+      but a panel will not be displayed if no hits reach the default threshold for display. Each panel can
+      then be examined in detail allowing re-setting of display thresholds for the other two panels. </p>
+
+  <h3>NOTES </h3>
+
+  <p>"Protein homology detection by HMM-HMM comparison". Söding J. Bioinformatics. 2005, updated most
+      recently in "A Completely Reimplemented MPI Bioinformatics Toolkit with a New HHpred Server at its Core."
+      Zimmermann et al., J Mol Biol. 2018 </p>
+  <p>https://toolkit.tuebingen.mpg.de/#/tools/hhpred </p>
+  <p>"HHyeast reveals XXX new domains in the yeast proteome". Christidi et al., Manuscript in Preparation </p>
+
     <p>Select an ORF </p>
     <form action="" method="post" name="fileform">
         {{ form.hidden_tag() }}
