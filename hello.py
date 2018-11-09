@@ -25,9 +25,9 @@ cp.setup(app)
 
 # Start bokeh servers
 bokeh_process1 = subprocess.Popen(
-    ['bokeh', 'serve', '--allow-websocket-origin=localhost:5000', 'lolliplotServer.py'], stdout=subprocess.PIPE)
+    ['bokeh', 'serve', '--allow-websocket-origin=hhyeastbac.uksouth.cloudapp.azure.com', 'lolliplotServer.py'], stdout=subprocess.PIPE)
 bokeh_process2 = subprocess.Popen(
-    ['bokeh', 'serve', '--allow-websocket-origin=localhost:5000', '--port=5007', 'lolliplotServerDetail.py'], stdout=subprocess.PIPE)
+    ['bokeh', 'serve', '--allow-websocket-origin=hhyeastbac.uksouth.cloudapp.azure.com', '--port=5007', 'lolliplotServerDetail.py'], stdout=subprocess.PIPE)
 
 @atexit.register
 def kill_server():
@@ -110,7 +110,7 @@ def load_name(filename):
     ov_min_r = request.args.get('ovm1', default=0.1, type=float)
     if os.path.isfile(filepath):
         bokeh_script = server_document(
-            url='http://localhost:5006/lolliplotServer',
+            url='http://hhyeastbac.uksouth.cloudapp.azure.com:5006/lolliplotServer',
             arguments=dict(filename=filepath, prob=prob, ov_min=ov_min, ov_min_r=ov_min_r))
 
         return render_template(
@@ -141,7 +141,7 @@ def load_detail(filename, db):
 
         if os.path.isfile(filepath):
            bokeh_script = server_document(
-               url='http://localhost:5007/lolliplotServerDetail', arguments=dict(filename=filepath, db=db))
+               url='http://hhyeastbac.uksouth.cloudapp.azure.com:5007/lolliplotServerDetail', arguments=dict(filename=filepath, db=db))
            return render_template(
                   'detail.html',
                   plot_script=bokeh_script,
@@ -156,4 +156,7 @@ def load_detail(filename, db):
         return render_template(
        	       'error.html',
                msg="Data for database "+db+" does not exist. Please choose between pdb, pfam or yeast.")
-               
+
+
+if __name__ == "__main__":
+    app.run(host='0.0.0.0')
