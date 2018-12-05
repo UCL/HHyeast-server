@@ -9,6 +9,18 @@
 {% block content %}
   <h3> {{name}} </h3>
 
+  <p>Detailed view of all the hits for database {{ db }} with matching probability above the
+      "Probability threshold" entered in the field below.</p>
+
+  <p>Pressing the "Preview clustering" button will display which cluster each hit will be grouped into,
+      based on the parameters entered in the boxes below. Hits are clustered together when the location
+      in the genome of both their edges is the same within the specified tolerance. The resulting combined
+      hit (cluster) limits are the widest ones to fully contain all the hits that belong to it. Higher tolerance
+      requirements means looser criteria for clustering hits together, and thus lead to less clusters.</p>
+
+  <p>When satisfied with the choice of probability threshold and clustering parameters, a summary of the resulting
+      clusters can be visualised for all databases by pressing the "Go to summary view" button.</p>
+
   <div class="bk-root">
       {{ plot_script|safe }}
   </div>
