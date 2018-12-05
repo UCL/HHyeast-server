@@ -45,22 +45,23 @@
 <p>Type a gene identifier, either systematic name or standard name if available. The server will offer
     valid options. Typically three panels will be displayed, one for each of the databases (PDB, Pfam, Yeast),
     but a panel will not be displayed if no hits reach the default matching probability threshold for display.
-    Each panel can then be examined in detail allowing re-setting of display thresholds for the other two panels. </p>
+    Each panel can then be examined in detail allowing re-setting of display thresholds for the other two panels.</p>
 
-<h3>NOTES </h3>
+<form action="" method="post" name="fileform">
+    {{ form.hidden_tag() }}
+    {{ form.filename }}
+    {{ form.display }}
+    {{ form.download }}
+</form>
+
+<br><br>
+
+<h4>NOTES </h4>
 
 <p id="ref1">[1] <a href="https://www.ncbi.nlm.nih.gov/pubmed/?term=10.1093/bioinformatics/bti125">"Protein homology
     detection by HMM-HMM comparison"</a>, Söding J., Bioinformatics, 2005, updated most recently in
     <a href="https://www.ncbi.nlm.nih.gov/pubmed/?term=10.1016%2Fj.jmb.2017.12.007">"A Completely Reimplemented MPI
         Bioinformatics Toolkit with a New HHpred Server at its Core."</a>, Zimmermann et al., J Mol Biol., 2018. </p>
-  <p id="ref2">[2] "HHyeast reveals XXX new domains in the yeast proteome". Christidi et al., Manuscript in Preparation </p>
+<p id="ref2">[2] "HHyeast reveals XXX new domains in the yeast proteome". Christidi et al., Manuscript in Preparation </p>
 
-    <p>Select an ORF </p>
-    <form action="" method="post" name="fileform">
-        {{ form.hidden_tag() }}
-        {{ form.filename }}
-        {{ form.display }}
-        {{ form.download }}
-    </form>
-    {% endblock content %}
-
+{% endblock content %}
