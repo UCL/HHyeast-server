@@ -8,8 +8,7 @@
 {% block content %}
   <h3> {{name}} </h3>
 
-  <p>Summary view of the strong hits for each database (PDB, Pfam and Yeast). The default matching
-      probability cutoff is 50%.</p>
+  <p>Summary view of the strong hits for each database (PDB, Pfam and Yeast).</p>
 
   <p>Note that similar hits are clustered together and only one entry per cluster is displayed. The name
       and probability shown on each entry is that of the highest probability hit of the cluster, whereas
@@ -17,6 +16,14 @@
       information about each cluster is displayed when the mouse hovers over it. To see all the hits for
       a specific database displayed, and to adjust the cutoff probability and clustering parameters,
       press one of the three buttons at the bottom of the page.</p>
+
+  <p>Parameter values:
+      <ul>
+          <li>Probability threshold: {{ prob }}</li>
+          <li>Hit overlap tolerance (number of residues): {{ ov_min }}</li>
+          <li>Hit overlap tolerance (length ratio): {{ ov_min_r }}</li>
+      </ul>
+  </p>
 
   <div class="bk-root">
        {{ plot_script|safe }}

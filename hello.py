@@ -116,7 +116,10 @@ def load_name(filename):
         return render_template(
                'plot.html',
                plot_script=bokeh_script,
-               name=filename)
+               name=filename,
+               prob=prob,
+               ov_min=ov_min,
+               ov_min_r=ov_min_r)
     else:
         return render_template(
             'error.html',
