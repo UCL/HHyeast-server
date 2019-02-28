@@ -13,7 +13,7 @@ python3 populate_templates.py localhost 30
 If you're not running locally, give the IP of the (virtual) machine you're running on.
 For example, on Azure:
 ```
-python3 populate_templates.py hhyeast.ukwest.cloudapp.azure.com 30
+python3 populate_templates.py hhyeast.ucl.ac.uk 30
 ```
 
 To run the flask application: 
