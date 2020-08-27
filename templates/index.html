@@ -5,13 +5,72 @@
 {% endblock breadcrumb_links %}
 
   {% block content %}
-  <p>Delivering accurate structural bioinformatics to the yeast community with the HHprY data </p>
-    <p>Select an ORF </p>
-    <form action="" method="post" name="fileform">
-        {{ form.hidden_tag() }}
-        {{ form.filename }}
-        {{ form.display }}
-        {{ form.download }}
-    </form>
-    {% endblock content %}
+<h1>Delivering accurate structural bioinformatics to the yeast community with the HHpredY data </h1>
 
+<h3>Welcome to the HHyeast website. </h3>
+
+<p>This website offers the results of remote homology searches of the entire genome of the model
+    budding yeast <i>Saccharomyces cerevisiae</i>. The searches have been carried out using the HHsearch
+    package developed by Johanne Soeding and colleagues <a href="#ref1">[1]</a>, a tool also known as
+    "HHpred" through its <a href="https://toolkit.tuebingen.mpg.de/#/tools/hhpred">online server</a>. </p>
+
+<p>The results show visualisations of the strongest homologies for 100% of 6,713 verified yeast open
+    reading frames (ORFs) in three databases:
+    <ul>
+        <li>PDB (solved structures)</li>
+        <li>Pfam (curated protein domain families from the European Bioinformatics Institute)</li>
+        <li>the yeast proteome itself</li>
+    </ul>
+</p>
+
+<p>For each ORF, a summary for each of the databases will be shown, with links at the bottom to more
+    detailed views. Those views allow investigation of the full set of hits and adjustment of the
+    parameters that produce the summary views. </p>
+
+<h3>Gaps between the domains in the visualisations </h3>
+
+<p>HHyeast has discovered many additional hits in the gaps between the domains displayed in this website
+    <a href="#ref2">[2]</a>. Although these are not included in the visualisations, the data can be
+    downloaded together with the data for the whole genome search results.
+</p>
+
+<h3>Downloaded data format </h3>
+
+<p>As well as being able to save images of the domain displays through the controls in each window,
+    the file from which the data has been extracted for the visualisation can be downloaded for each ORF.
+    This can be done either when selecting the ORF in this page, or from the individual view page.</p>
+
+<p>The downloaded .zip file when unpacked, it contains the whole genome search results for all three
+    databases in a single file with the suffix ".hhr", which can be opened as a text file. If additional
+    matches have been found in the gaps between the domains of the whole genome search, the data for those
+    are also contained in the unpacked .zip file, in a separate folder for each gap region. Every such
+    folder contains two .hhr files, one for PDB and one for Pfam.</p>
+
+<h3>Job submission </h3>
+
+<p>Type a gene identifier, either systematic name or standard name if available. The server will offer
+    valid options. When the "Display plot" button is pressed, typically three panels will be displayed,
+    one for each of the databases (PDB, Pfam, Yeast). However, a panel will not be displayed if no hits
+    reach the default matching probability threshold for display.
+    Each panel can then be examined in detail allowing re-setting of display thresholds for the other
+    two panels as well.</p>
+
+<form action="" method="post" name="fileform">
+    {{ form.hidden_tag() }}
+    {{ form.filename }}
+    {{ form.display }}
+    {{ form.download }}
+</form>
+
+<br><br>
+
+<h4>REFERENCES </h4>
+
+<p id="ref1">[1] <a href="https://www.ncbi.nlm.nih.gov/pubmed/?term=10.1093/bioinformatics/bti125">"Protein homology
+    detection by HMM-HMM comparison"</a>, Söding J., Bioinformatics, 2005, updated most recently in
+    <a href="https://www.ncbi.nlm.nih.gov/pubmed/?term=10.1016%2Fj.jmb.2017.12.007">"A Completely Reimplemented MPI
+        Bioinformatics Toolkit with a New HHpred Server at its Core."</a>, Zimmermann et al., J Mol Biol., 2018. </p>
+<p id="ref2">[2] "HHyeast reveals hundreds of new domains in the yeast proteome". Christidi et al., manuscript in
+    preparation </p>
+
+{% endblock content %}
