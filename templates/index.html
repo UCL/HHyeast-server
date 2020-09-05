@@ -7,12 +7,19 @@
   {% block content %}
 <h1>Delivering accurate structural bioinformatics to the yeast community with the HHyeast data </h1>
 
-<h3>Welcome to the HHyeast website. </h3>
+<h3>Welcome to the HHyeast website.</h3>
+
+<form action="" method="post" name="fileform">
+    {{ form.hidden_tag() }}
+    {{ form.filename }}
+    {{ form.display }}
+    {{ form.download }}
+</form>
 
 <p>This website offers the results of remote homology searches of the entire genome of the model
     budding yeast <i>Saccharomyces cerevisiae</i>. The searches have been carried out using the HHsearch
-    package developed by Johanne Soeding and colleagues <a href="#ref1">[1]</a>, a tool also known as
-    "HHpred" through its <a href="https://toolkit.tuebingen.mpg.de/#/tools/hhpred">online server</a>. </p>
+    package developed by Johanne Soeding and colleagues <a href="#ref1">[1]</a>, a tool available online as
+    "HHpred" through the <a href="https://toolkit.tuebingen.mpg.de/#/tools/hhpred">server</a>. </p>
 
 <p>The results show visualisations of the strongest homologies for 100% of 6,713 verified yeast open
     reading frames (ORFs) in three databases:
@@ -23,44 +30,38 @@
     </ul>
 </p>
 
-<p>For each ORF, a summary for each of the databases will be shown, with links at the bottom to more
-    detailed views. Those views allow investigation of the full set of hits and adjustment of the
-    parameters that produce the summary views. </p>
+<p>For each ORF, a summary for each of the databases that has at least one significant hit will be shown. Links at 
+    the bottom allow you to change parameters (e.g. threshold pSS to zero!) so you can investigate hits and adjust parameters 
+    in one database, and then use those parameters to produce the summary views for all three databases. 
+    Note, only hits matching 30 columns or more are reported. </p>
 
-<h3>Gaps between the domains in the visualisations </h3>
+<h3>Gaps with no identified domains </h3>
 
-<p>HHyeast has discovered many additional hits in the gaps between the domains displayed in this website
+<p>HHyeast has discovered some additional hits in the gaps between the domains displayed in this website
     <a href="#ref2">[2]</a>. Although these are not included in the visualisations, the data can be
-    downloaded together with the data for the whole genome search results.
+    obtained from the HHyeast Github site, together with all other data for our yeast genome searches. 
+    Please email Tim Levine (tim levine @ucl.ac.uk) for data requests.
 </p>
 
 <h3>Downloaded data format </h3>
 
 <p>As well as being able to save images of the domain displays through the controls in each window,
-    the file from which the data has been extracted for the visualisation can be downloaded for each ORF.
-    This can be done either when selecting the ORF in this page, or from the individual view page.</p>
+    individual files from which the data has been extracted for the visualisation can be downloaded for each ORF.
+    This can be done either when selecting the ORF in this page. This file will indicate which residues and what 
+    (predicted) secondary structural elements have been aligned. It will also incude hits of <30 matched columns.</p>
 
-<p>The downloaded .zip file when unpacked, it contains the whole genome search results for all three
-    databases in a single file with the suffix ".hhr", which can be opened as a text file. If additional
-    matches have been found in the gaps between the domains of the whole genome search, the data for those
-    are also contained in the unpacked .zip file, in a separate folder for each gap region. Every such
-    folder contains two .hhr files, one for PDB and one for Pfam.</p>
+<p>The single downloaded data file containing the whole genome search results for all three databases is 
+    a text file with suffix ".hhr", and it can be opened by any text editor (e.g. Mac OS X "TextEdit".</p>
 
 <h3>Job submission </h3>
 
-<p>Type a gene identifier, either systematic name or standard name if available. The server will offer
+<p>In the box at the top of the page, type a gene identifier, either systematic name or standard name if 
+    available. The server will offer
     valid options. When the "Display plot" button is pressed, typically three panels will be displayed,
     one for each of the databases (PDB, Pfam, Yeast). However, a panel will not be displayed if no hits
     reach the default matching probability threshold for display.
     Each panel can then be examined in detail allowing re-setting of display thresholds for the other
     two panels as well.</p>
-
-<form action="" method="post" name="fileform">
-    {{ form.hidden_tag() }}
-    {{ form.filename }}
-    {{ form.display }}
-    {{ form.download }}
-</form>
 
 <br><br>
 
