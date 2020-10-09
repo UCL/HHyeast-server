@@ -3,7 +3,7 @@ from bokeh.plotting import figure
 from bokeh.io import curdoc
 from bokeh.models import ColumnDataSource, Range1d, LabelSet, Label
 from bokeh.models import LinearColorMapper, ColorBar
-from bokeh.models import palettes
+from bokeh.palettes import brewer
 from bokeh.layouts import widgetbox, column, layout
 from bokeh.models.widgets import Slider, Panel, Tabs, TextInput, PreText
 from bokeh.models import HoverTool, CustomJS
@@ -14,8 +14,8 @@ import dataProcessing
 import sys
 import os
 
-pal = palettes.brewer['YlOrRd'][8]
-pal.reverse()
+pal_br = brewer['YlOrRd'][8]
+pal = tuple(reversed(pal_br))
 cmap = LinearColorMapper(palette=pal, low=50, high=100)
 
 try:
@@ -76,7 +76,7 @@ try:
                     x_range=(0,xmax), y_range=(max(ncl_ref,ncl)/2+1,0), x_axis_location="above")
         p1.ygrid.visible=False
         p1.yaxis.visible=False
-        p1.y_range.callback = myCallback
+        p1.y_range.js_on_change('bounds', myCallback)
         p1.hbar(y="y", height=0.4, left="x1", right="x2", source=source,
                 color={'field': 'pcent', 'transform': cmap})
         labels_pname1 = LabelSet(x='x1', y='y', text='name', source=source, text_baseline='middle', text_color='black')
