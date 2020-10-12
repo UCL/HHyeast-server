@@ -5,7 +5,7 @@ flexx
 scipy
 numpy
 ipython
--e git+https://github.com/UCL-RITS/CSB-structural-bio-tools.git#egg=CSB-structural-bio-tools
+-e git+https://github.com/UCL-RITS/CSB-structural-bio-tools.git#egg=csb
 jinja2
 requests
 pytest
