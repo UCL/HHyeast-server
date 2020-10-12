@@ -1,8 +1,8 @@
 [Unit]
-Description=Start flask app for hhyeast server
+Description=Flask app for hhyeast server
 
 [Service]
-ExecStart=/home/ilektra/HHyeast-server/start-server.sh
+ExecStart=/home/ubuntu/HHyeast-server/start-server.sh
 Type=simple
 RemainAfterExit=yes
 

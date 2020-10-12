@@ -1,6 +1,5 @@
 #!/bin/bash
-cd /home/ilektra/HHyeast-server
-source /home/ubuntu/.virtualenvs/hhserver/bin/activate
+cd /home/ubuntu/HHyeast-server
 export FLASK_APP=hello.py
 export FLASK_DEBUG=0
 
