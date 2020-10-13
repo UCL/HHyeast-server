@@ -3,7 +3,7 @@ from bokeh.plotting import figure
 from bokeh.io import curdoc
 from bokeh.models import ColumnDataSource, Range1d, LabelSet, Label
 from bokeh.models import LinearColorMapper, ColorBar
-from bokeh.models import palettes
+from bokeh.palettes import brewer
 from bokeh.layouts import widgetbox, column, layout, gridplot
 from bokeh.models.widgets import TextInput, Button, PreText, Div
 from bokeh.models import HoverTool, CustomJS
@@ -15,9 +15,9 @@ import nameProcessing as namep
 import sys
 import os
 
-pal_seq = palettes.brewer['YlOrRd'][8]
-pal_seq.reverse()
-pal_cat = palettes.brewer['Paired'][5]
+pal_seq_br = brewer['YlOrRd'][8]
+pal_seq = tuple(reversed(pal_seq_br))
+pal_cat = brewer['Paired'][5]
 cmap = LinearColorMapper(palette=pal_seq, low=50, high=100)
 
 try:
@@ -54,7 +54,7 @@ try:
     myCallback = CustomJS(code="""
         window.dispatchEvent(new Event('resize'));
     """)
-    p.y_range.callback = myCallback
+    p.y_range.js_on_change('bounds', myCallback)
     ###
     p.hbar(y="y", height=0.4, left="x1", right="x2", source=source,
            color={'field': 'pcent', 'transform': cmap})

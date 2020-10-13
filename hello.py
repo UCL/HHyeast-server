@@ -159,7 +159,3 @@ def load_detail(filename, db):
         return render_template(
        	       'error.html',
                msg="Data for database "+db+" does not exist. Please choose between pdb, pfam or yeast.")
-
-
-if __name__ == "__main__":
-    app.run(host='0.0.0.0')
