@@ -6,6 +6,6 @@ scipy==1.5.2
 numpy==1.19.2
 ipython==7.16.1
 -e git+https://github.com/UCL-RITS/CSB-structural-bio-tools.git#egg=csb
-jinja2==2.10
-requests==2.18.4
+jinja2==2.10.1
+requests==2.20.0
 pytest==6.1.1
