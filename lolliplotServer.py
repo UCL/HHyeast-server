@@ -71,7 +71,7 @@ try:
         source.data = new_data
 
         ### Main figure
-        p1 = figure(tools=[hover,'save','xpan','wheel_zoom','reset'], title=title,
+        p1 = figure(tools=[hover,'save','wheel_zoom','reset'], title=title,
                     width=1500, height=25*max(ncl_ref,ncl),
                     x_range=(0,xmax), y_range=(max(ncl_ref,ncl)/2+1,0), x_axis_location="above")
         p1.ygrid.visible=False
