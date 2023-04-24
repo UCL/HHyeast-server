@@ -46,7 +46,7 @@ try:
 
     ### Main figure
     ymax = 10
-    p = figure(tools=[hover,'save','pan','wheel_zoom','undo','redo','reset'], width=1500, height=25*max(nhits,ymax),
+    p = figure(tools=[hover,'save','ypan','wheel_zoom','undo','redo','reset'], width=1500, height=25*max(nhits,ymax),
                x_range=(0,xmax), y_range=(max(nhits,ymax)/2+1,0), x_axis_location="above")
     p.ygrid.visible=False
     p.yaxis.visible=False
